@@ -1,6 +1,11 @@
-package domain
+package model
+
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type RegularProfile struct {
+	ID            primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	Name          string
 	Lastname      string
 	Gender        string
@@ -13,6 +18,7 @@ type RegularProfile struct {
 }
 
 type BusinessProfile struct {
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	CompanyName string
 	Email       string
 	WebSite     string
@@ -22,9 +28,5 @@ type BusinessProfile struct {
 }
 
 type Tweet struct {
-	Name        string
-	Description string
-	//Profile     Profile
-	NumberOfLikes int32
-	Likes         []RegularProfile
+	ID primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 }
