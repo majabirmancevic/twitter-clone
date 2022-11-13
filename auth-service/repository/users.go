@@ -3,18 +3,22 @@ package repository
 import (
 	"auth-service/model"
 	"context"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"gopkg.in/mgo.v2/bson"
+	"log"
+	"time"
 )
 
 const (
-	DATABASE   = "users"
+	DATABASE   = "twitter"
 	COLLECTION = "users"
 )
 
 type UserRepository struct {
-	users *mongo.Collection
+	users  *mongo.Collection
+	cli    *mongo.Client
+	logger *log.Logger
 }
 
 func NewUserMongoDBStore(client *mongo.Client) model.UserStore {
@@ -24,31 +28,72 @@ func NewUserMongoDBStore(client *mongo.Client) model.UserStore {
 	}
 }
 
-func (r *UserRepository) Get(id primitive.ObjectID) (*model.RegularProfile, error) {
-	filter := bson.M{"_id": id}
-	return r.filterOne(filter)
+//// NoSQL: Constructor which reads db configuration from environment
+//func New(ctx context.Context, logger *log.Logger) (*UserRepository, error) {
+//	dburi := os.Getenv("MONGO_DB_URI")
+//
+//	client, err := mongo.NewClient(options.Client().ApplyURI(dburi))
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	err = client.Connect(ctx)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return &UserRepository{
+//		cli:    client,
+//		logger: logger,
+//	}, nil
+//}
+
+func (r *UserRepository) getCollection() *mongo.Collection {
+	userDatabase := r.cli.Database("twitter")
+	usersCollection := userDatabase.Collection("users")
+	return usersCollection
 }
 
-func (r *UserRepository) Insert(order *model.RegularProfile) error {
-	//TODO implement me
-	panic("implement me")
-}
+func (r *UserRepository) GetByUsername(username string) (*model.RegularProfile, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-func (r *UserRepository) filterOne(filter interface{}) (User *model.RegularProfile, err error) {
-	result := r.users.FindOne(context.TODO(), filter)
-	err = result.Decode(&User)
-	return
-}
-
-func decode(cursor *mongo.Cursor) (users []*model.RegularProfile, err error) {
-	for cursor.Next(context.TODO()) {
-		var User model.RegularProfile
-		err = cursor.Decode(&User)
-		if err != nil {
-			return
-		}
-		users = append(users, &User)
+	usersCollection := r.getCollection()
+	var user model.RegularProfile
+	err := usersCollection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+	if err != nil {
+		r.logger.Println(err)
+		return nil, err
 	}
-	err = cursor.Err()
-	return
+	return &user, nil
+}
+
+func (r *UserRepository) GetById(id string) (*model.RegularProfile, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	usersCollection := r.getCollection()
+
+	var user model.RegularProfile
+	objID, _ := primitive.ObjectIDFromHex(id)
+	err := usersCollection.FindOne(ctx, bson.M{"_id": objID}).Decode(&user)
+	if err != nil {
+		r.logger.Println(err)
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *UserRepository) Insert(user *model.RegularProfile) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	usersCollection := r.getCollection()
+
+	result, err := usersCollection.InsertOne(ctx, &user)
+	if err != nil {
+		r.logger.Println(err)
+		return err
+	}
+	r.logger.Printf("Documents ID: %v\n", result.InsertedID)
+	return nil
 }

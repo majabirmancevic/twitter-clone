@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+
+  auth_service:
+    image: auth-service
+    container_name: auth-service
+    build:
+      context: .
+      dockerfile: ./auth-service/Dockerfile
+    restart: always
+    ports:
+      - ${AUTH_SERVICE_PORT}:${AUTH_SERVICE_PORT}
+    environment:
+      ORDERING_DB_HOST: ${AUTH_DB_HOST}
+      ORDERING_DB_PORT: ${AUTH_DB_PORT}
+    depends_on:
+      - auth_db
+    networks:
+      - network
+
+  ordering_db:
+    image: mongo
+    container_name: auth_db
+    restart: on-failure
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge

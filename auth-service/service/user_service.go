@@ -1,21 +1,46 @@
 package service
 
 import (
-	"auth-service/repository"
+	"auth-service/model"
+	"auth-service/security"
+	"errors"
+	"go.mongodb.org/mongo-driver/mongo"
+	"strings"
 )
 
 type UserService struct {
-	store repository.UserRepository
+	store model.UserStore
 }
 
-func NewUserService(store repository.UserRepository) *UserService {
+func NewUserService(store model.UserStore) *UserService {
 	return &UserService{
 		store: store,
 	}
 }
 
-//func (service *UserService) GetById(id primitive.ObjectID) (*model.RegularProfile, error) {
-//	return service.store.GetById(id)
-//}
+func (s *UserService) Get(id string) (*model.RegularProfile, error) {
+	return s.store.GetById(id)
+}
 
-//func (service *UserService) Save(ctx context.Context, user *model.RegularProfile)
+func (s *UserService) SignUp(req *model.RegularProfile) (*model.RegularProfile, error) {
+	req.Password = security.EncryptPassword(req.Password)
+	req.Name = strings.TrimSpace(req.Name)
+	req.Lastname = strings.TrimSpace(req.Lastname)
+	req.Username = strings.TrimSpace(req.Username)
+	req.Tweets = []model.Tweet{}
+	found, err := s.store.GetByUsername(req.Username)
+	if err == mongo.ErrNoDocuments {
+		user := new(model.RegularProfile)
+		err := s.store.Insert(user)
+		if err != nil {
+			return nil, err
+		}
+		return user, nil
+	}
+
+	if found == nil {
+		return nil, err
+	}
+
+	return nil, errors.New("email already exists")
+}

@@ -1,8 +1,7 @@
 package model
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
-
 type UserStore interface {
-	Get(id primitive.ObjectID) (*RegularProfile, error)
+	GetById(id string) (*RegularProfile, error)
+	GetByUsername(username string) (*RegularProfile, error)
 	Insert(order *RegularProfile) error
 }
