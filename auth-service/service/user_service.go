@@ -22,6 +22,10 @@ func (s *UserService) Get(id string) (*model.RegularProfile, error) {
 	return s.store.GetById(id)
 }
 
+func (s *UserService) GetByUsername(username string) (*model.RegularProfile, error) {
+	return s.store.GetByUsername(username)
+}
+
 func (s *UserService) SignUp(req *model.RegularProfile) (*model.RegularProfile, error) {
 	req.Password = security.EncryptPassword(req.Password)
 	req.Name = strings.TrimSpace(req.Name)

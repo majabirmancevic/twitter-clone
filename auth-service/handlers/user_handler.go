@@ -34,11 +34,24 @@ func (handler *UserHandler) Init(r *mux.Router) {
 	loginRouter.HandleFunc("/login", handler.UserLogin)
 	loginRouter.Use(handler.MiddlewareContentTypeSet)
 
-	r.HandleFunc("/signup", handler.UserSignup).Methods("POST")
+	signupRouter := r.Methods(http.MethodPost).Subrouter()
+	signupRouter.HandleFunc("/signup", handler.UserSignup)
+	signupRouter.Use(handler.MiddlewareContentTypeSet)
+	//r.HandleFunc("/signup", handler.UserSignup).Methods("POST")
 	http.Handle("/", r)
 }
 
 func (handler *UserHandler) UserSignup(response http.ResponseWriter, request *http.Request) {
+	username := request.URL.Query().Get("username")
+
+	findUser, error := handler.service.GetByUsername(username)
+	if error != nil {
+		handler.logger.Print("Database exception: ", error)
+	}
+	if findUser.Username == username {
+		handler.logger.Print("User already exists with this username: ", error)
+	}
+
 	var user model.RegularProfile
 	err := json.NewDecoder(request.Body).Decode(&user)
 	if err != nil {
@@ -47,7 +60,9 @@ func (handler *UserHandler) UserSignup(response http.ResponseWriter, request *ht
 	}
 	user.ID = primitive.NewObjectID()
 	result, _ := handler.service.SignUp(&user)
+	response.WriteHeader(http.StatusCreated)
 	json.NewEncoder(response).Encode(result)
+
 }
 
 func (handler *UserHandler) UserLogin(response http.ResponseWriter, request *http.Request) {

@@ -8,6 +8,7 @@ import (
 	"auth-service/service"
 	"context"
 	"fmt"
+	gorillaHandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
@@ -70,9 +71,11 @@ func (server *Server) start(orderHandler *handlers.UserHandler) {
 	r := mux.NewRouter()
 	orderHandler.Init(r)
 
+	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}))
+
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", server.config.Port),
-		Handler: r,
+		Handler: cors(r),
 	}
 
 	wait := time.Second * 15
