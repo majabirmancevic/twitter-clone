@@ -77,10 +77,11 @@ func (server *Server) start(orderHandler *handlers.UserHandler) {
 		Addr:    fmt.Sprintf(":%s", server.config.Port),
 		Handler: cors(r),
 	}
-
+	log.Println("Povezivanje na servis " + server.config.Port)
 	wait := time.Second * 15
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
+			log.Println("Greska pri povezivanju")
 			log.Println(err)
 		}
 	}()
