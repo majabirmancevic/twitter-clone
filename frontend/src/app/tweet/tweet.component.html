@@ -1,0 +1,36 @@
+<div *ngIf="tweet.retweetedBy" class="retweeted-by"> 
+    <img src="assets/svg/retweet.svg">
+    {{tweet.retweetedBy.firstName + " " + tweet.retweetedBy.lastName}}
+    Retweeted
+</div>
+<div class="tweet-header">
+    <img [src]="'http://localhost:8080/user/profile-picture/get/'+ tweet.username" class="profile-img">
+    <div class="tweet-header__author">
+        <div>{{tweet.firstName}} {{tweet.lastName }}</div>
+        <div >
+            <div>@{{tweet.username}}</div>
+            <div>&bull;</div>
+            <div>{{tweet.duration}}</div>
+        </div>
+    </div>
+</div>
+<div class="tweet-content" (click)="goToTweet(tweet.id)">{{tweet.tweetText}}</div>
+
+<div *ngIf="tweet.quote" class="tweet-quote-container">
+    <div  class="tweet-quote">
+        <app-tweet [footer]="false" [tweet]="tweet.quote"></app-tweet>
+    </div>
+</div>
+
+<div *ngIf="counters" class="tweet-counters">
+    <div> <span>{{tweet.retweetCounter}}</span>   Retweets</div>
+    <div> <span>{{tweet.likeCounter}}</span>   Likes</div>
+</div>
+
+<div *ngIf="footer" class="tweet-footer">
+    
+    <app-reply [tweet]="tweet"></app-reply>
+    <app-retweet [tweet]="tweet"></app-retweet>
+    <app-like [tweet]="tweet"></app-like>
+    <app-bookmark [tweet]="tweet"></app-bookmark>
+</div>

@@ -1,0 +1,73 @@
+import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { SignUpPayload } from 'src/app/payloads/request/sign-up';
+import { AuthService } from 'src/app/services/auth.service';
+import { usernameValidator } from 'src/app/validators/username';
+
+@Component({
+  selector: 'app-sign-up',
+  templateUrl: './sign-up.component.html',
+  styleUrls: ['./sign-up.component.css']
+})
+export class SignUpComponent implements OnInit {
+
+  form: FormGroup;
+  payload: SignUpPayload;
+  constructor(private authService: AuthService, private router: Router,) {
+
+    this.form = new FormGroup({
+      name: new FormControl("", Validators.required),
+      lastname: new FormControl("", Validators.required),
+      gender:new FormControl("",Validators.required),
+      age: new FormControl("", [Validators.min(13), Validators.required]),
+      placeOfLiving: new FormControl("",Validators.required),
+      email: new FormControl("", [Validators.required, Validators.email]),
+      username: new FormControl("", {
+        validators: [Validators.required],
+        asyncValidators: [usernameValidator(this.authService)],
+        updateOn: "blur"
+      }), 
+      password: new FormControl("", Validators.required)
+    });
+
+    this.payload = {
+      name: "",
+      lastname: "",
+      gender : "",
+      age : 0,
+      placeOfLiving: "",
+      email: "",
+      username: "", 
+      password: ""
+    }
+  }
+
+  ngOnInit(): void {
+  }
+
+  signUp() {
+    this.payload.name = this.form.get('name')?.value;
+    this.payload.lastname = this.form.get('lastname')?.value;
+    this.payload.gender = this.form.get('gender')?.value;
+    this.payload.age = this.form.get('age')?.value;
+    this.payload.placeOfLiving = this.form.get('placeOfLiving')?.value;
+    this.payload.email = this.form.get('email')?.value;
+    this.payload.username = this.form.get('username')?.value;  
+    this.payload.password = this.form.get('password')?.value;
+    const self = this;
+    this.authService.signUp(this.payload).subscribe({
+      complete() {
+        self.router.navigate(['/sign-in'], { queryParams: { registered: 'true' } });
+      },
+      error(error) {
+        console.log(error);
+      }
+    })
+  }
+
+  get username() {
+    return this.form.controls['username'];
+  }
+
+}
