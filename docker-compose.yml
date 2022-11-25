@@ -21,6 +21,15 @@ services:
     depends_on:
       - mongo
 
+  api_gateway:
+    build:
+      context: ./api_gateway/
+      dockerfile: Dockerfile
+    container_name: api_gateway
+    restart: on-failure
+    ports:
+      - 8001:8001
+
   mongo:
     image: mongo:4.4.6
     restart: always
