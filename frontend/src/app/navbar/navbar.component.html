@@ -20,14 +20,10 @@
                 <img src="assets/svg/messages.svg" class="sidebar-item-icon">
                 <div class="icon-label">Messages</div>
             </div>
-    
-            <div class="sidebar-item " [ngClass]="{'active': getUrl() === '/bookmarks'}">
-                <img src="assets/svg/bookmark.svg" class="sidebar-item-icon ">
-                <div [routerLink]="'/bookmarks'" class="icon-label">Bookmarks</div>
-            </div>
+
     
             <div [routerLink]="'/profile/tweets'" class="sidebar-item" 
-            [ngClass]="{'active': getUrl() === '/profile/tweets' || getUrl() === '/profile/retweets' || getUrl() === '/profile/replies' || getUrl() === '/profile/likes'}">
+            [ngClass]="{'active': getUrl() === '/profile/tweets' || getUrl() === '/profile/replies' || getUrl() === '/profile/likes'}">
                 <img src="assets/svg/profile.svg" class="sidebar-item-icon">
                 <div class="icon-label">Profile</div>
             </div>

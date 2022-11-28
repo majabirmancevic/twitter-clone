@@ -18,6 +18,11 @@ services:
       #- MONGO_DB_URI=mongodb://root:pass@mongo:27017
       - MONGO_DB_URI=mongodb://mongo:27017
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - EMAIL_FROM=${EMAIL_FROM}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_PORT=587
     depends_on:
       - mongo
 

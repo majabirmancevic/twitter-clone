@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -107,6 +108,22 @@ func (pr *AuthRepo) GetByUsername(username string) (*model.RegularProfile, error
 	return &user, nil
 }
 
+func (pr *AuthRepo) GetByVerificationCode(code string) (*model.RegularProfile, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	usersCollection := pr.getCollection()
+
+	var user model.RegularProfile
+	err := usersCollection.FindOne(ctx, bson.M{"verificationCode": code}).Decode(&user)
+	if err != nil {
+		pr.logger.Println(" -------- Ovaj korisnik ne postoji")
+		pr.logger.Println(err)
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (pr *AuthRepo) GetAll() (model.RegularProfiles, error) {
 	// Initialise context (after 5 seconds timeout, abort operation)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -125,6 +142,28 @@ func (pr *AuthRepo) GetAll() (model.RegularProfiles, error) {
 		return nil, err
 	}
 	return users, nil
+}
+
+func (pr *AuthRepo) Update(id string, user *model.RegularProfile) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	usersCollection := pr.getCollection()
+
+	objID, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.M{"_id": objID}
+	update := bson.M{"$set": bson.M{
+		"verificationCode": user.VerificationCode,
+		"verified":         user.Verified,
+	}}
+	result, err := usersCollection.UpdateOne(ctx, filter, update)
+	pr.logger.Printf("Documents matched: %v\n", result.MatchedCount)
+	pr.logger.Printf("Documents updated: %v\n", result.ModifiedCount)
+
+	if err != nil {
+		pr.logger.Println(err)
+		return err
+	}
+	return nil
 }
 
 func (pr *AuthRepo) getCollection() *mongo.Collection {

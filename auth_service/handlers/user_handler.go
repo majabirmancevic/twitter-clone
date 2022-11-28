@@ -6,6 +6,7 @@ import (
 	"auth-service/security"
 	"context"
 	"errors"
+	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"net/http"
@@ -53,6 +54,39 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 	}
 
 	//rw.WriteHeader(http.StatusBadRequest)
+}
+
+// 	VERIFY EMAIL
+
+func (p *AuthHandler) VerifyEmail(rw http.ResponseWriter, h *http.Request) {
+	vars := mux.Vars(h)
+	code := vars["verificationCode"]
+	verificationCode := security.Encode(code)
+
+	//var updatedUser model.RegularProfile
+	updatedUser, err := p.repo.GetByVerificationCode(verificationCode)
+
+	if err != nil {
+		log.Println("Invalid verification code or user doesn't exists")
+		log.Println(err.Error())
+		response := errors.New("Invalid verification code or user doesn't exists")
+		security.WriteAsJson(rw, http.StatusBadRequest, response)
+		return
+	}
+
+	if updatedUser.Verified {
+		log.Println("User already verified")
+		log.Println(err.Error())
+		response := errors.New("User already verified")
+		security.WriteAsJson(rw, http.StatusConflict, response)
+		return
+	}
+
+	updatedUser.VerificationCode = ""
+	updatedUser.Verified = true
+	//p.repo.Update(result.ID,&)
+
+	//ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Email verified successfully"})
 }
 
 func (p *AuthHandler) SignIn(rw http.ResponseWriter, h *http.Request) {
