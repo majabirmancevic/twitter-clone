@@ -75,7 +75,7 @@ func main() {
 	logger.Println("Server listening on port", port)
 	//Distribute all the connections to goroutines
 	go func() {
-		err := server.ListenAndServe()
+		err := server.ListenAndServeTLS("auth_service/certificates/self-ssl.crt", "auth_service/certificates/self-ssl.key")
 		if err != nil {
 			logger.Fatal(err)
 		}

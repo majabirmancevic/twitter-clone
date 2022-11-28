@@ -10,5 +10,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 FROM alpine
 WORKDIR /root/
 COPY --from=builder /app/main .
+COPY  ./auth_service/certificates ./auth_service/certificates
 EXPOSE 8001
 CMD ["./main"]
