@@ -23,12 +23,12 @@ services:
 
   api_gateway:
     build:
-      context: ./api_gateway/
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./api_gateway/Dockerfile
     container_name: api_gateway
     restart: on-failure
     ports:
-      - 8001:8001
+      - 8000:8000
 
   mongo:
     image: mongo:4.4.6
