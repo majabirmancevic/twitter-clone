@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HomePageComponent } from './pages/home-page/home-page.component';
+import { EmailConfirmComponent } from './pages/landing-page/email-confirm/email-confirm.component';
 import { LandingPageComponent } from './pages/landing-page/landing-page.component';
 import { SignInComponent } from './pages/landing-page/sign-in/sign-in.component';
 import { SignUpComponent } from './pages/landing-page/sign-up/sign-up.component';
@@ -12,11 +13,12 @@ const routes: Routes = [
   {path : "" , component: LandingPageComponent},
   {path : "sign-in" , component: SignInComponent},
   {path : "sign-up" , component: SignUpComponent},
+  {path : "verifyemail" , component: EmailConfirmComponent,
+    children: [{path : ":code" , component: EmailConfirmComponent}]
+  },
   {path : "home" , component: HomePageComponent, canActivate: [AuthGuard]},
   {path : "tweet/:id" , component: TweetPageComponent, canActivate: [AuthGuard]},
   {path : "profile/tweets" , component: ProfilePageComponent, canActivate: [AuthGuard]},
-  {path : "profile/retweets" , component: ProfilePageComponent, canActivate: [AuthGuard]},
-  {path : "profile/replies" , component: ProfilePageComponent, canActivate: [AuthGuard]},
   {path : "profile/likes" , component: ProfilePageComponent, canActivate: [AuthGuard]},
   {path : "profile/update" , component: ProfilePageComponent, canActivate: [AuthGuard]},
 

@@ -30,6 +30,11 @@ export class AuthService {
       })
     )
   }
+
+  verifyEmail(code: any) { 
+    return this.http.get("http://localhost:8001/verifyEmail/", code);
+    
+  }
   
   logout() {
     const self = this;

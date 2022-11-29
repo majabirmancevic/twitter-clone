@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { SignUpPayload } from 'src/app/payloads/request/sign-up';
 import { AuthService } from 'src/app/services/auth.service';
 import { usernameValidator } from 'src/app/validators/username';
@@ -14,7 +15,7 @@ export class SignUpComponent implements OnInit {
 
   form: FormGroup;
   payload: SignUpPayload;
-  constructor(private authService: AuthService, private router: Router,) {
+  constructor(private authService: AuthService, private toastr: ToastrService, private router: Router) {
 
     this.form = new FormGroup({
       name: new FormControl("", Validators.required),
@@ -58,10 +59,11 @@ export class SignUpComponent implements OnInit {
     const self = this;
     this.authService.signUp(this.payload).subscribe({
       complete() {
-        self.router.navigate(['/sign-in'], { queryParams: { registered: 'true' } });
+        self.router.navigate(['/verifyemail'], { queryParams: { registered: 'true' , verified: 'false' } });
       },
       error(error) {
         console.log(error);
+        self.toastr.error("Something went wrong! Error : ", error.code);
       }
     })
   }

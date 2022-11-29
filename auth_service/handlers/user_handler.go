@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"github.com/gorilla/mux"
+	"github.com/thanhpk/randstr"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"net/http"
@@ -32,6 +33,8 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 	user.ID = primitive.NewObjectID()
 	hashedPassword, _ := security.EncryptPassword(user.Password)
 	user.Password = hashedPassword
+	user.Role = "regular"
+	user.Verified = false
 
 	found, _ := p.repo.GetByUsername(user.Username)
 
@@ -46,8 +49,30 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 			http.Error(rw, "Email is not valid !", http.StatusBadRequest)
 			p.logger.Println("NEISPRAVNA EMAIL ADRESA !")
 		}
+		// Generate Verification Code
+		code := randstr.String(20)
+		verificationCode := security.Encode(code)
+		p.logger.Println("------- VERIFIKACIONI KOD KREIRAN ", verificationCode)
+
+		user.VerificationCode = verificationCode
+
 		p.logger.Println("------- SLANJE U BAZU")
 		p.repo.Insert(user)
+
+		var firstName = user.Name
+
+		if strings.Contains(firstName, " ") {
+			firstName = strings.Split(firstName, " ")[1]
+		}
+
+		// 👇 Send Email
+		emailData := security.EmailData{
+			URL:       "http://localhost:4200/verifyemail/" + code,
+			FirstName: firstName,
+			Subject:   "Your account verification code",
+		}
+		p.logger.Println("------- slanje mejla ", emailData)
+		security.SendEmail(user, &emailData)
 		rw.WriteHeader(http.StatusCreated)
 		p.logger.Println("------- USPESNO KREIRAN KORISNIK")
 
@@ -60,7 +85,7 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 
 func (p *AuthHandler) VerifyEmail(rw http.ResponseWriter, h *http.Request) {
 	vars := mux.Vars(h)
-	code := vars["verificationCode"]
+	code := vars["code"]
 	verificationCode := security.Encode(code)
 
 	//var updatedUser model.RegularProfile
@@ -84,7 +109,9 @@ func (p *AuthHandler) VerifyEmail(rw http.ResponseWriter, h *http.Request) {
 
 	updatedUser.VerificationCode = ""
 	updatedUser.Verified = true
-	//p.repo.Update(result.ID,&)
+	p.repo.Update(updatedUser.ID, updatedUser)
+
+	rw.WriteHeader(http.StatusOK)
 
 	//ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Email verified successfully"})
 }
@@ -109,7 +136,14 @@ func (p *AuthHandler) SignIn(rw http.ResponseWriter, h *http.Request) {
 	if err != nil {
 		log.Println("This user does not exist")
 		log.Println(err.Error())
-		errors.New("sign in failed - This user does not exist")
+
+		security.WriteError(rw, http.StatusBadRequest, errors.New("sign in failed - This user does not exist"))
+		return
+	}
+
+	if !user.Verified {
+		security.WriteError(rw, http.StatusForbidden, errors.New("sign in failed - This user does not verified"))
+		return
 	}
 
 	log.Println("--------Provera passworda-------- ")

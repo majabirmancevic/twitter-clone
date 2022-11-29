@@ -144,13 +144,13 @@ func (pr *AuthRepo) GetAll() (model.RegularProfiles, error) {
 	return users, nil
 }
 
-func (pr *AuthRepo) Update(id string, user *model.RegularProfile) error {
+func (pr *AuthRepo) Update(id primitive.ObjectID, user *model.RegularProfile) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	usersCollection := pr.getCollection()
 
-	objID, _ := primitive.ObjectIDFromHex(id)
-	filter := bson.M{"_id": objID}
+	//objID, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.M{"_id": id}
 	update := bson.M{"$set": bson.M{
 		"verificationCode": user.VerificationCode,
 		"verified":         user.Verified,

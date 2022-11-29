@@ -58,6 +58,9 @@ func main() {
 	loginRouter.HandleFunc("/login", userHandler.SignIn)
 	loginRouter.Use(userHandler.MiddlewareLoginDeserialization)
 
+	verifyRouter := router.Methods(http.MethodGet).Subrouter()
+	verifyRouter.HandleFunc("/verifyEmail/{code}", userHandler.VerifyEmail)
+
 	// ZA PROVERU PRISTUPA RUTA NA OSNOVU TOKENA
 	//middlewares.Authenticate(userHandler.SignIn)
 

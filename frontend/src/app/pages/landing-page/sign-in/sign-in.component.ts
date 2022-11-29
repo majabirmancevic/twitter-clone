@@ -51,6 +51,7 @@ export class SignInComponent implements OnInit {
       error(error){
         self.toastr.error("Wrong Username or Password");
         console.log(error)
+       
       }
     });
   }

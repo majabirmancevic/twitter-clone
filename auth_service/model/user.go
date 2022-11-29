@@ -33,7 +33,7 @@ type RegularProfile struct {
 	Password         string             `bson:"password" json:"password" validate:"required,min=6"`
 	VerificationCode string             `bson:"verificationCode" json:"verificationCode" `
 	Verified         bool               `bson:"verified" json:"verified" `
-	//Role            string             `json:"role" bson:"role"`
+	Role             string             `json:"role" bson:"role"`
 }
 
 // Response for client without password
@@ -48,6 +48,7 @@ type DBRegularResponse struct {
 	Username         string             `bson:"username" json:"username" validate:"required"`
 	VerificationCode string             `bson:"verificationCode" json:"verificationCode" `
 	Verified         bool               `bson:"verified" json:"verified" `
+	Role             string             `json:"role" bson:"role"`
 }
 
 type SignInRequest struct {
@@ -72,6 +73,7 @@ func NewUserResponse(user *RegularProfile) DBRegularResponse {
 		Username:         user.Username,
 		VerificationCode: user.VerificationCode,
 		Verified:         user.Verified,
+		Role:             user.Role,
 	}
 }
 

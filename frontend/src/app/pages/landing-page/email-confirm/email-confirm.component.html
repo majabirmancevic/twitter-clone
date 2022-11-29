@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    </head>
+    <body class="container">
+        <form [formGroup]="form" (ngSubmit)="verifyEmail()">
+                 
+            <label>Verify email address</label>
+            <div>
+                <span>Verification code</span>
+                <input [formControlName]="'code'" type="text" readonly>
+            </div> 
+            
+            <input type="submit" value="Verify Email">
+        </form>
+    </body>
+</html>

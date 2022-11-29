@@ -23,6 +23,7 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { AuthGuard } from './services/auth.guard';
 import { TokenInterceptor } from './services/token-interceptor';
 import { NgxWebstorageModule } from 'ngx-webstorage';
+import { EmailConfirmComponent } from './pages/landing-page/email-confirm/email-confirm.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { NgxWebstorageModule } from 'ngx-webstorage';
     LandingPageComponent,
     SignInComponent,
     SignUpComponent,
-    NavbarComponent
+    NavbarComponent,
+    EmailConfirmComponent
   ],
   imports: [
     BrowserModule,
