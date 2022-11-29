@@ -1,4 +1,4 @@
-package twitter_clone
+package data
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"time"
-
 	// NoSQL: module containing Mongo api client
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

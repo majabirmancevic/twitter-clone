@@ -1,12 +1,11 @@
-package twitter_clone
+package handlers
 
 import (
-	"Rest/data"
 	"context"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-
-	"github.com/gorilla/mux"
+	"twitter_clone/data"
 )
 
 type KeyProduct struct{}

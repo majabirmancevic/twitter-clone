@@ -1,4 +1,4 @@
-package twitter_clone
+package data
 
 import (
 	"encoding/json"
