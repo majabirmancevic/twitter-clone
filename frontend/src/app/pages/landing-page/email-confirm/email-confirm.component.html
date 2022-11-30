@@ -7,11 +7,10 @@
     </head>
     <body class="container">
         <form [formGroup]="form" (ngSubmit)="verifyEmail()">
-                 
-            <label>Verify email address</label>
+                        
             <div>
-                <span>Verification code</span>
-                <input [formControlName]="'code'" type="text" readonly>
+                <span>Enter your verification code</span>
+                <input [formControlName]="'code'" type="text"  >
             </div> 
             
             <input type="submit" value="Verify Email">

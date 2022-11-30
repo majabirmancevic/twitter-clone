@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { SignUpPayload } from 'src/app/payloads/request/sign-up';
 import { AuthService } from 'src/app/services/auth.service';
-import { usernameValidator } from 'src/app/validators/username';
+
 
 @Component({
   selector: 'app-sign-up',
@@ -26,7 +26,6 @@ export class SignUpComponent implements OnInit {
       email: new FormControl("", [Validators.required, Validators.email]),
       username: new FormControl("", {
         validators: [Validators.required],
-        asyncValidators: [usernameValidator(this.authService)],
         updateOn: "blur"
       }), 
       password: new FormControl("", Validators.required)
@@ -57,6 +56,7 @@ export class SignUpComponent implements OnInit {
     this.payload.username = this.form.get('username')?.value;  
     this.payload.password = this.form.get('password')?.value;
     const self = this;
+    
     this.authService.signUp(this.payload).subscribe({
       complete() {
         self.router.navigate(['/verifyemail'], { queryParams: { registered: 'true' , verified: 'false' } });

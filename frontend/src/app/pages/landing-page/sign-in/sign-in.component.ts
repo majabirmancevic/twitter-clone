@@ -30,8 +30,8 @@ export class SignInComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(params =>{
-      if(params['registered'] !== undefined && params['registered'] === "true"){
-        this.toastr.success("Signup Successful");
+      if(params['registered'] !== undefined && params['registered'] === "true" && params['verified'] === "true"){
+        this.toastr.success("Signup Successful! Your account has been verified.");
         console.log("Sign Up Successful");
       }
     })

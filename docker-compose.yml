@@ -1,6 +1,20 @@
 version: "3.8"
 
 services:
+
+  api_gateway:
+    build:
+      context: .
+      dockerfile: ./api_gateway/Dockerfile
+    container_name: api_gateway
+    restart: on-failure
+    environment:
+      API_GATE_PORT : 8000
+      AUTH_HOST : auth_service
+      AUTH_PORT: 8001
+    ports:
+      - '8000:8000'
+
   auth_service:
     build:
       context: .
@@ -12,28 +26,19 @@ services:
       - 8001:8001
     #Will be accessible through os.Getenv("PORT")
     environment:
-      - PORT=8001
+        PORT: 8001
       # NoSQL: environment variable holding connection URI for Mongo database
       # protocol://username:password@hostname:port
       #- MONGO_DB_URI=mongodb://root:pass@mongo:27017
-      - MONGO_DB_URI=mongodb://mongo:27017
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - EMAIL_FROM=${EMAIL_FROM}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASS=${SMTP_PASS}
-      - SMTP_PORT=587
+        MONGO_DB_URI: mongodb://mongo:27017
+        JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+#        EMAIL_FROM: ${EMAIL_FROM}
+#        SMTP_HOST: ${SMTP_HOST}
+#        SMTP_USER: ${SMTP_USER}
+#        SMTP_PASS: ${SMTP_PASS}
+#        SMTP_PORT: 587
     depends_on:
       - mongo
-
-  api_gateway:
-    build:
-      context: .
-      dockerfile: ./api_gateway/Dockerfile
-    container_name: api_gateway
-    restart: on-failure
-    ports:
-      - 8000:8000
 
   mongo:
     image: mongo:4.4.6

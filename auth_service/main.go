@@ -22,6 +22,8 @@ func main() {
 		port = "8001"
 	}
 
+	//template.Must(template.ParseGlob("templates/*.html"))
+
 	// Initialize context
 	timeoutContext, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -64,7 +66,9 @@ func main() {
 	// ZA PROVERU PRISTUPA RUTA NA OSNOVU TOKENA
 	//middlewares.Authenticate(userHandler.SignIn)
 
-	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}))
+	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
+		gorillaHandlers.AllowedHeaders([]string{"Origin, Content-Type, X-Auth-Token"}),
+		gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "PATCH"}))
 
 	//Initialize the server
 	server := http.Server{

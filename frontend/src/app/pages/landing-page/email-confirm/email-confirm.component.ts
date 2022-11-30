@@ -16,26 +16,31 @@ export class EmailConfirmComponent implements OnInit {
 
   constructor(private activatedRoute:ActivatedRoute, private toastr: ToastrService, private authService: AuthService, private router: Router) {
     this.form = new FormGroup({
-      verificationCode: new FormControl("", Validators.required)    
+      code: new FormControl("", Validators.required)    
     })
 
    }
 
   ngOnInit(): void {
-    this.activatedRoute.queryParams.subscribe(params =>{
-      if(params['registered'] !== undefined && params['registered'] === "true"){
-        this.toastr.success("An email with a verification code has been sent to your email");
-        console.log("Sign Up Successful");
-      }
-    })
-    this.code = this.activatedRoute.snapshot.paramMap.get('code')
+    this.code = this.activatedRoute.snapshot.paramMap.get('code') 
+      this.activatedRoute.queryParams.subscribe(params =>{
+        if(params['registered'] !== undefined && params['registered'] === "true"){
+          this.toastr.success("An email with a verification code has been sent to your email");
+          console.log("Sent verification code to email");
+        }
+      })
+  
   }
 
   verifyEmail(){
     this.code = this.form.get('code')?.value;
+    const self = this;
     this.authService.verifyEmail(this.code).subscribe({
+      next(){
+        //self.toastr.error("Checking your verification code ..");
+      },
       complete() {
-        self.router.navigate(['/verifyemail'], { queryParams: { registered: 'true' , verified: 'false' } });
+        self.router.navigate(['/sign-in'], { queryParams: { registered: 'true' , verified: 'true' } });
       },
       error(error) {
         console.log(error);

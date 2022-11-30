@@ -29,6 +29,7 @@ func NewAuthHandler(l *log.Logger, r *repository.AuthRepo) *AuthHandler {
 
 func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 	user := h.Context().Value(KeyUser{}).(*model.RegularProfile)
+
 	user.Email = strings.ToLower(user.Email)
 	user.ID = primitive.NewObjectID()
 	hashedPassword, _ := security.EncryptPassword(user.Password)
@@ -57,7 +58,11 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 		user.VerificationCode = verificationCode
 
 		p.logger.Println("------- SLANJE U BAZU")
-		p.repo.Insert(user)
+		err := p.repo.Insert(user)
+		if err != nil {
+			http.Error(rw, "Neuspesno dodavanje korisnika !", http.StatusBadRequest)
+			p.logger.Println(" ----- Error ", err)
+		}
 
 		var firstName = user.Name
 
@@ -67,14 +72,20 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 
 		// 👇 Send Email
 		emailData := security.EmailData{
-			URL:       "http://localhost:4200/verifyemail/" + code,
+			URL:       "Your account verification code is " + code,
 			FirstName: firstName,
-			Subject:   "Your account verification code",
+			Subject:   "Account verification",
 		}
+
 		p.logger.Println("------- slanje mejla ", emailData)
 		security.SendEmail(user, &emailData)
+
+		rw.Header().Add("Content-Type", "application/json")
+		rw.Header().Add("Access-Control-Allow-Origin", "*")
+
 		rw.WriteHeader(http.StatusCreated)
 		p.logger.Println("------- USPESNO KREIRAN KORISNIK")
+		return
 
 	}
 
@@ -88,8 +99,12 @@ func (p *AuthHandler) VerifyEmail(rw http.ResponseWriter, h *http.Request) {
 	code := vars["code"]
 	verificationCode := security.Encode(code)
 
+	log.Println("CODE ", code)
+	log.Println("Verification code ", verificationCode)
 	//var updatedUser model.RegularProfile
 	updatedUser, err := p.repo.GetByVerificationCode(verificationCode)
+
+	log.Println("UPDATED USER ", updatedUser)
 
 	if err != nil {
 		log.Println("Invalid verification code or user doesn't exists")
@@ -111,6 +126,9 @@ func (p *AuthHandler) VerifyEmail(rw http.ResponseWriter, h *http.Request) {
 	updatedUser.Verified = true
 	p.repo.Update(updatedUser.ID, updatedUser)
 
+	rw.Header().Set("Content-Type", "application/json")
+	rw.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	rw.Header().Set("Access-Control-Allow-Origin", "*")
 	rw.WriteHeader(http.StatusOK)
 
 	//ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Email verified successfully"})
@@ -168,6 +186,7 @@ func (p *AuthHandler) SignIn(rw http.ResponseWriter, h *http.Request) {
 	}
 
 	security.WriteAsJson(rw, http.StatusOK, response)
+
 }
 
 func (p *AuthHandler) GetAllRegularUsers(rw http.ResponseWriter, h *http.Request) {
@@ -227,6 +246,10 @@ func (p *AuthHandler) MiddlewareContentTypeSet(next http.Handler) http.Handler {
 		p.logger.Println("Method [", h.Method, "] - Hit path :", h.URL.Path)
 
 		rw.Header().Add("Content-Type", "application/json")
+		//rw.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		//rw.Header().Set("Access-Control-Allow-Origin", "*")
+
+		//rw.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 		next.ServeHTTP(rw, h)
 	})

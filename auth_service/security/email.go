@@ -2,14 +2,11 @@ package security
 
 import (
 	"auth-service/model"
-	"bytes"
 	"crypto/tls"
 	"html/template"
 	"log"
 	"os"
 	"path/filepath"
-
-	"github.com/k3a/html2text"
 
 	"gopkg.in/gomail.v2"
 )
@@ -44,29 +41,36 @@ func ParseTemplateDir(dir string) (*template.Template, error) {
 func SendEmail(user *model.RegularProfile, data *EmailData) {
 
 	// Sender data.
-	from := os.Getenv("EMAIL_FROM")
-	smtpPass := os.Getenv("SMTP_PASS")
-	smtpUser := os.Getenv("SMTP_USER")
+	from := "ibsit2022@gmail.com"
+	smtpPass := "xeuloaiprwagrouh"
+	smtpUser := "ibsit2022@gmail.com"
 	to := user.Email
-	smtpHost := os.Getenv("SMTP_HOST")
+	smtpHost := "smtp.gmail.com"
 	smtpPort := 587
 
-	var body bytes.Buffer
+	//var body bytes.Buffer
 
-	template, err := ParseTemplateDir("templates")
-	if err != nil {
-		log.Fatal("Could not parse template", err)
-	}
+	//template, err := ParseTemplateDir("templates")
+	//if err != nil {
+	//	log.Fatal("Could not parse template", err)
+	//}
+	//
+	//template.ExecuteTemplate(&body, "verificationCode.html", &data)
 
-	template.ExecuteTemplate(&body, "verificationCode.html", &data)
+	//parsedTemplate, err := template.ParseFiles("auth_service/templates/verificationCode.html")
+	//parsedTemplate.Execute(&body, &data)
+	//if err != nil {
+	//	log.Println("Error executing template :", err)
+	//	return
+	//}
 
 	m := gomail.NewMessage()
 
 	m.SetHeader("From", from)
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", data.Subject)
-	m.SetBody("text/html", body.String())
-	m.AddAlternative("text/plain", html2text.HTML2Text(body.String()))
+	m.SetBody("text/html", data.URL)
+	m.AddAlternative("text/plain", data.URL)
 
 	d := gomail.NewDialer(smtpHost, smtpPort, smtpUser, smtpPass)
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}

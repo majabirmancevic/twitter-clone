@@ -63,6 +63,11 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {           
+            "ssl":true,
+            "sslKey":"src/app/certificates/self-ssl.key",
+            "sslCert":"src/app/certificates/self-ssl.crt"
+          },
           "configurations": {
             "production": {
               "browserTarget": "frontend:build:production"
@@ -76,12 +81,12 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "frontend:build"
+            "browserTarget": "frontend:build"       
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
-          "options": {
+          "options": {           
             "main": "src/test.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",

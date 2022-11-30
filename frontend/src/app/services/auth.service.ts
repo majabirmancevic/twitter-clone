@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { LocalStorageService } from 'ngx-webstorage';
@@ -15,13 +15,29 @@ export class AuthService {
   
   constructor(private http: HttpClient, private localStorage: LocalStorageService, private router: Router) { }
   
+  
   signUp(payload: SignUpPayload) {
-    return this.http.post("http://localhost:8001/", payload);
+
+    const headers = new HttpHeaders({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+
+    }); 
+    const options = { headers: headers };
+       
+    return this.http.post("https://localhost:8001/", JSON.stringify(payload), options);
   }
   
   signIn(payload: SignInRequestPayload) {
+
+    const headers = new HttpHeaders({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    }); 
+    const options = { headers: headers };
     const self = this;
-    return this.http.post<SignInResponsePayload>("http://localhost:8001/login", payload).pipe<SignInResponsePayload>(
+
+    return this.http.post<SignInResponsePayload>("https://localhost:8001/login", JSON.stringify(payload), options).pipe<SignInResponsePayload>(
       map(response=>{
         self.localStorage.store("token", response.token);
         self.localStorage.store("username", response.user.username);
@@ -32,7 +48,12 @@ export class AuthService {
   }
 
   verifyEmail(code: any) { 
-    return this.http.get("http://localhost:8001/verifyEmail/", code);
+    const headers = new HttpHeaders({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }); 
+    const options = { headers: headers };
+    return this.http.get(`https://localhost:8001/verifyEmail/${code}`,  options);
     
   }
   
@@ -71,7 +92,7 @@ export class AuthService {
     return this.localStorage.retrieve("accessToken");
   }
   
-  findAllUsernames(): Observable<String[]> {
-    return this.http.get<String[]>("http://localhost:8080/auth/usernames");
-  }
+  // findAllUsernames(): Observable<String[]> {
+  //   return this.http.get<String[]>("http://localhost:8080/auth/usernames");
+  // }
 }
