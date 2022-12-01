@@ -30,7 +30,7 @@ type RegularProfile struct {
 	PlaceOfLiving    string             `bson:"placeOfLiving" json:"placeOfLiving" validate:"required"`
 	Email            string             `json:"email" bson:"email" validate:"email,required"`
 	Username         string             `bson:"username" json:"username" validate:"required"`
-	Password         string             `bson:"password" json:"password" validate:"required,min=6"`
+	Password         string             `bson:"password" json:"password" validate:"required,min=8"`
 	VerificationCode string             `bson:"verificationCode" json:"verificationCode" `
 	Verified         bool               `bson:"verified" json:"verified" `
 	Role             string             `json:"role" bson:"role"`

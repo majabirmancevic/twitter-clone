@@ -28,7 +28,7 @@ export class SignUpComponent implements OnInit {
         validators: [Validators.required],
         updateOn: "blur"
       }), 
-      password: new FormControl("", Validators.required)
+      password: new FormControl("", [Validators.required,Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$')])
     });
 
     this.payload = {
@@ -58,12 +58,15 @@ export class SignUpComponent implements OnInit {
     const self = this;
     
     this.authService.signUp(this.payload).subscribe({
-      complete() {
-        self.router.navigate(['/verifyemail'], { queryParams: { registered: 'true' , verified: 'false' } });
+      next() {
+        self.router.navigate(['/verify-email'], { queryParams: { registered: 'true', verified: 'false' } });
       },
+      complete(){},
       error(error) {
         console.log(error);
-        self.toastr.error("Something went wrong! Error : ", error.code);
+        console.log("------- GRESKA -------")
+        console.log(error.code)
+        self.toastr.error("Something went wrong!");
       }
     })
   }

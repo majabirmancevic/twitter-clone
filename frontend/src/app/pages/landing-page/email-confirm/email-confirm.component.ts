@@ -12,17 +12,20 @@ import { AuthService } from 'src/app/services/auth.service';
 export class EmailConfirmComponent implements OnInit {
 
   form: FormGroup;
-  code: any;
+  inputcode: any;
 
   constructor(private activatedRoute:ActivatedRoute, private toastr: ToastrService, private authService: AuthService, private router: Router) {
+    
     this.form = new FormGroup({
       code: new FormControl("", Validators.required)    
-    })
+    }),
+
+    this.inputcode = ""
 
    }
 
   ngOnInit(): void {
-    this.code = this.activatedRoute.snapshot.paramMap.get('code') 
+    //this.code = this.activatedRoute.snapshot.paramMap.get('code') 
       this.activatedRoute.queryParams.subscribe(params =>{
         if(params['registered'] !== undefined && params['registered'] === "true"){
           this.toastr.success("An email with a verification code has been sent to your email");
@@ -33,9 +36,9 @@ export class EmailConfirmComponent implements OnInit {
   }
 
   verifyEmail(){
-    this.code = this.form.get('code')?.value;
+    this.inputcode = this.form.get('code')?.value;
     const self = this;
-    this.authService.verifyEmail(this.code).subscribe({
+    this.authService.verifyEmail(this.inputcode).subscribe({
       next(){
         //self.toastr.error("Checking your verification code ..");
       },

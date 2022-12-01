@@ -22,13 +22,13 @@
             <label>Gender</label>
             <div>
                 <span *ngIf="!form.get('gender')?.valid && form.get('gender')?.touched" style="color:red ;">Please enter gender</span>
-                <input  [formControlName]="'gender'" type="text">
+                <input  [formControlName]="'gender'" type="text" placeholder="M/F">
             </div> 
 
             <label>Age</label>
             <div>
                 <span *ngIf="!form.get('age')?.valid && form.get('age')?.touched" style="color:red ;">Please enter your age</span>
-                <input  [formControlName]="'age'" type="number">
+                <input  [formControlName]="'age'" type="number" min="1">
             </div> 
             
             <label>Place of living</label>
@@ -56,7 +56,7 @@
                 <input  [formControlName]="'password'" type="password">
             </div> 
             
-            <input type="submit" value="Sign up">
+            <input [disabled]="!form.valid" type="submit" value="Sign up">
         </form>
     </body>
 </html>

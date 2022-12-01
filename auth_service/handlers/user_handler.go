@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"net/mail"
 	"strings"
+	"unicode"
 )
 
 type KeyUser struct{}
@@ -30,26 +31,39 @@ func NewAuthHandler(l *log.Logger, r *repository.AuthRepo) *AuthHandler {
 func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 	user := h.Context().Value(KeyUser{}).(*model.RegularProfile)
 
-	user.Email = strings.ToLower(user.Email)
-	user.ID = primitive.NewObjectID()
+	//if security.IsValid(user.Password) == false {
+	//	response := errors.New("the password is not in a valid format")
+	//	security.WriteAsJson(rw, http.StatusBadRequest, response)
+	//	return
+	//}
+	user.Gender = strings.ToUpper(user.Gender)
+	if VerifyInputs(user.Name, user.Lastname, user.PlaceOfLiving, user.Username, user.Password, user.Email, user.Gender, user.Age) == false {
+		security.WriteAsJson(rw, http.StatusBadRequest, errors.New("your data input isn't valid"))
+		return
+	}
+
 	hashedPassword, _ := security.EncryptPassword(user.Password)
 	user.Password = hashedPassword
+	user.Email = strings.ToLower(user.Email)
+	user.ID = primitive.NewObjectID()
 	user.Role = "regular"
 	user.Verified = false
 
 	found, _ := p.repo.GetByUsername(user.Username)
 
 	if found != nil && found.Username == user.Username {
-		http.Error(rw, "User already exist with this username !", http.StatusBadRequest)
 		p.logger.Fatal("This username is already used !")
+		security.WriteAsJson(rw, http.StatusBadRequest, "User already exist with this username !")
+		return
 	}
 
 	if found == nil || (found != nil && found.Username != user.Username) {
 
-		if valid(user.Email) == false {
-			http.Error(rw, "Email is not valid !", http.StatusBadRequest)
-			p.logger.Println("NEISPRAVNA EMAIL ADRESA !")
-		}
+		//if valid(user.Email) == false {
+		//	p.logger.Println("NEISPRAVNA EMAIL ADRESA !")
+		//	security.WriteAsJson(rw, http.StatusBadRequest, "Email is not valid !")
+		//	return
+		//}
 		// Generate Verification Code
 		code := randstr.String(20)
 		verificationCode := security.Encode(code)
@@ -60,8 +74,9 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 		p.logger.Println("------- SLANJE U BAZU")
 		err := p.repo.Insert(user)
 		if err != nil {
-			http.Error(rw, "Neuspesno dodavanje korisnika !", http.StatusBadRequest)
 			p.logger.Println(" ----- Error ", err)
+			security.WriteAsJson(rw, http.StatusBadRequest, "Neuspesno dodavanje korisnika !")
+			return
 		}
 
 		var firstName = user.Name
@@ -80,16 +95,13 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 		p.logger.Println("------- slanje mejla ", emailData)
 		security.SendEmail(user, &emailData)
 
-		rw.Header().Add("Content-Type", "application/json")
-		rw.Header().Add("Access-Control-Allow-Origin", "*")
-
-		rw.WriteHeader(http.StatusCreated)
-		p.logger.Println("------- USPESNO KREIRAN KORISNIK")
+		security.WriteAsJson(rw, http.StatusCreated, model.NewUserResponse(user))
 		return
+		//rw.WriteHeader(http.StatusCreated)
+		p.logger.Println("------- USPESNO KREIRAN KORISNIK")
 
 	}
 
-	//rw.WriteHeader(http.StatusBadRequest)
 }
 
 // 	VERIFY EMAIL
@@ -126,10 +138,8 @@ func (p *AuthHandler) VerifyEmail(rw http.ResponseWriter, h *http.Request) {
 	updatedUser.Verified = true
 	p.repo.Update(updatedUser.ID, updatedUser)
 
-	rw.Header().Set("Content-Type", "application/json")
-	rw.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	rw.Header().Set("Access-Control-Allow-Origin", "*")
 	rw.WriteHeader(http.StatusOK)
+	return
 
 	//ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Email verified successfully"})
 }
@@ -145,6 +155,11 @@ func (p *AuthHandler) SignIn(rw http.ResponseWriter, h *http.Request) {
 	log.Println("--------Provera kredencijala : ", credentials)
 	if credentials == nil {
 		security.WriteError(rw, http.StatusBadRequest, errors.New("password and username are required "))
+		return
+	}
+
+	if (IsValidString(credentials.Username) && security.IsValid(credentials.Password)) == false {
+		security.WriteError(rw, http.StatusBadRequest, errors.New("credentials are not valid "))
 		return
 	}
 
@@ -169,7 +184,8 @@ func (p *AuthHandler) SignIn(rw http.ResponseWriter, h *http.Request) {
 	log.Println("--------VerifyPassword ERROR : ", err)
 	if err != nil {
 		log.Println("Passwords does not matches !!!", err.Error())
-		errors.New("sign in failed - Passwords does not matches")
+		security.WriteError(rw, http.StatusForbidden, errors.New("sign in failed - Passwords does not matches"))
+		return
 	}
 
 	log.Println("--------Kreiranje tokena-------- ")
@@ -177,15 +193,17 @@ func (p *AuthHandler) SignIn(rw http.ResponseWriter, h *http.Request) {
 	log.Println("--------NewToken ERROR : ", err)
 	if err != nil {
 		log.Println("Token cannot be created", err.Error())
-		errors.New("sign in failed - Token cannot be created")
+		security.WriteError(rw, http.StatusForbidden, errors.New("sign in failed - Token cannot be created"))
+		return
 	}
 
 	response := model.SignInResponseRegular{
-		Token:          token,
-		RegularProfile: model.NewUserResponse(user),
+		Token: token,
+		//RegularProfile: model.NewUserResponse(user),
 	}
 
 	security.WriteAsJson(rw, http.StatusOK, response)
+	return
 
 }
 
@@ -255,7 +273,27 @@ func (p *AuthHandler) MiddlewareContentTypeSet(next http.Handler) http.Handler {
 	})
 }
 
-func valid(email string) bool {
+func Valid(email string) bool {
 	_, err := mail.ParseAddress(email)
 	return err == nil
+}
+
+func IsValidString(s string) bool {
+
+	var valid = false
+
+	for _, char := range s {
+
+		if unicode.IsLetter(char) && strings.ContainsAny(s, "<>*()/") == false {
+			valid = true
+		}
+	}
+	return valid
+}
+
+func VerifyInputs(name string, lastaname string, placeOfLiving string, username string, password string, email string, gender string, age int32) bool {
+	if IsValidString(name) && IsValidString(lastaname) && IsValidString(placeOfLiving) && IsValidString(username) && security.IsValid(password) && Valid(email) && IsValidString(gender) && (strings.Contains(gender, "M") || strings.Contains(gender, "F")) && (age >= 13) {
+		return true
+	}
+	return false
 }

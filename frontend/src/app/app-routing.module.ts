@@ -13,9 +13,8 @@ const routes: Routes = [
   {path : "" , component: LandingPageComponent},
   {path : "sign-in" , component: SignInComponent},
   {path : "sign-up" , component: SignUpComponent},
-  {path : "verifyemail" , component: EmailConfirmComponent,
-    children: [{path : ":code" , component: EmailConfirmComponent}]
-  },
+  {path : "verify-email" , component: EmailConfirmComponent },
+    // children: [{path : ":code" , component: EmailConfirmComponent}]
   {path : "home" , component: HomePageComponent, canActivate: [AuthGuard]},
   {path : "tweet/:id" , component: TweetPageComponent, canActivate: [AuthGuard]},
   {path : "profile/tweets" , component: ProfilePageComponent, canActivate: [AuthGuard]},
