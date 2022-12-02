@@ -38,6 +38,8 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 	//}
 	user.Gender = strings.ToUpper(user.Gender)
 	if VerifyInputs(user.Name, user.Lastname, user.PlaceOfLiving, user.Username, user.Password, user.Email, user.Gender, user.Age) == false {
+		p.logger.Println(user.Name, user.Lastname, user.PlaceOfLiving, user.Username, user.Password, user.Email, user.Gender, user.Age)
+		p.logger.Println(VerifyInputs(user.Name, user.Lastname, user.PlaceOfLiving, user.Username, user.Password, user.Email, user.Gender, user.Age))
 		security.WriteAsJson(rw, http.StatusBadRequest, errors.New("your data input isn't valid"))
 		return
 	}
@@ -95,9 +97,9 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 		p.logger.Println("------- slanje mejla ", emailData)
 		security.SendEmail(user, &emailData)
 
-		security.WriteAsJson(rw, http.StatusCreated, model.NewUserResponse(user))
-		return
-		//rw.WriteHeader(http.StatusCreated)
+		//security.WriteAsJson(rw, http.StatusCreated, model.NewUserResponse(user))
+
+		rw.WriteHeader(http.StatusCreated)
 		p.logger.Println("------- USPESNO KREIRAN KORISNIK")
 
 	}
@@ -139,7 +141,6 @@ func (p *AuthHandler) VerifyEmail(rw http.ResponseWriter, h *http.Request) {
 	p.repo.Update(updatedUser.ID, updatedUser)
 
 	rw.WriteHeader(http.StatusOK)
-	return
 
 	//ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Email verified successfully"})
 }
@@ -203,7 +204,6 @@ func (p *AuthHandler) SignIn(rw http.ResponseWriter, h *http.Request) {
 	}
 
 	security.WriteAsJson(rw, http.StatusOK, response)
-	return
 
 }
 
@@ -280,19 +280,27 @@ func Valid(email string) bool {
 
 func IsValidString(s string) bool {
 
-	var valid = false
-
 	for _, char := range s {
 
-		if unicode.IsLetter(char) && strings.ContainsAny(s, "<>*()/") == false {
-			valid = true
+		if (unicode.IsLetter(char) == true) && (strings.ContainsAny(s, "<>*()/") == false) {
+			return true
 		}
 	}
-	return valid
+	return false
 }
 
 func VerifyInputs(name string, lastaname string, placeOfLiving string, username string, password string, email string, gender string, age int32) bool {
-	if IsValidString(name) && IsValidString(lastaname) && IsValidString(placeOfLiving) && IsValidString(username) && security.IsValid(password) && Valid(email) && IsValidString(gender) && (strings.Contains(gender, "M") || strings.Contains(gender, "F")) && (age >= 13) {
+	log.Println("NAME ", IsValidString(name))
+	log.Println("LASTNAME ", IsValidString(lastaname))
+	log.Println("PLACE OF LIVING ", IsValidString(placeOfLiving))
+	log.Println("USERNAME ", IsValidString(username))
+	log.Println("PASSWORD ", security.IsValid(password))
+	log.Println("EMAIL ", Valid(email))
+	log.Println("GENDER ", IsValidString(gender))
+	log.Println("GENDER M/F ", strings.Contains(gender, "M") || strings.Contains(gender, "F"))
+	log.Println("AGE ", age >= 13)
+
+	if IsValidString(name) && IsValidString(lastaname) && IsValidString(placeOfLiving) && IsValidString(username) && security.IsValid(password) && Valid(email) && (IsValidString(gender) && (strings.Contains(gender, "M") || strings.Contains(gender, "F"))) && (age >= 13) {
 		return true
 	}
 	return false

@@ -3,6 +3,7 @@ package security
 import (
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"log"
 	"strings"
 	"unicode"
 )
@@ -21,11 +22,11 @@ func VerifyPassword(hashedPass string, password string) error {
 
 func IsValid(s string) bool {
 	var (
-		hasMinLen  = false
-		hasUpper   = false
-		hasLower   = false
-		hasNumber  = false
-		hasSpecial = false
+		hasMinLen = false
+		hasUpper  = false
+		hasLower  = false
+		hasNumber = false
+		//hasSpecial = false
 	)
 	if len(s) >= 8 {
 		hasMinLen = true
@@ -38,9 +39,19 @@ func IsValid(s string) bool {
 			hasLower = true
 		case unicode.IsNumber(char):
 			hasNumber = true
-		case strings.ContainsAny(s, "<>*()/") == false:
-			hasSpecial = true
+			//case strings.ContainsAny(s, "<>*()/") == false:
+			//	hasSpecial = true
 		}
 	}
-	return hasMinLen && hasUpper && hasLower && hasNumber && hasSpecial
+
+	result := hasMinLen && hasUpper && hasLower && hasNumber
+	log.Println("REZULTAT BEZ PROVERE KARAKTERA JE ", result)
+
+	if strings.ContainsAny(s, "<>*()/^#$%&") == true {
+		result = false
+		log.Println("REZULTAT POSLE JE ", result)
+	}
+	return result
+	//hasMinLen && hasUpper && hasLower && hasNumber && strings.ContainsAny(s, "<>*()/^#$%&") == true
+	//&& hasSpecial
 }
