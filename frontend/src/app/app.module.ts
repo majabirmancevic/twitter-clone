@@ -24,6 +24,7 @@ import { AuthGuard } from './services/auth.guard';
 import { TokenInterceptor } from './services/token-interceptor';
 import { NgxWebstorageModule } from 'ngx-webstorage';
 import { EmailConfirmComponent } from './pages/landing-page/email-confirm/email-confirm.component';
+import { RecaptchaModule } from 'ng-recaptcha';
 
 @NgModule({
   declarations: [
@@ -50,6 +51,7 @@ import { EmailConfirmComponent } from './pages/landing-page/email-confirm/email-
     ToastrModule.forRoot(),
     BrowserAnimationsModule,
     NgxWebstorageModule.forRoot(),
+    RecaptchaModule
   ],
   providers: [
     AuthGuard,

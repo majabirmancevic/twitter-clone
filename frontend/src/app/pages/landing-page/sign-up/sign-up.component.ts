@@ -15,6 +15,7 @@ export class SignUpComponent implements OnInit {
 
   form: FormGroup;
   payload: SignUpPayload;
+  captcha: string;
   constructor(private authService: AuthService, private toastr: ToastrService, private router: Router) {
 
     this.form = new FormGroup({
@@ -41,9 +42,17 @@ export class SignUpComponent implements OnInit {
       username: "", 
       password: ""
     }
+
+    this.captcha = '';
+
   }
 
   ngOnInit(): void {
+  }
+
+  resolved(captchaResponse: string){
+    this.captcha = captchaResponse;
+    console.log('resovled capctha with response: ' + this.captcha);
   }
 
   signUp() {

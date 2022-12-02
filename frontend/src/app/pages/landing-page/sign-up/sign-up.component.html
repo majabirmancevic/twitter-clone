@@ -54,9 +54,18 @@
             <div>
                 <span *ngIf="!form.get('password')?.valid && form.get('password')?.touched" style="color:red ;">Password cannot be empty</span>
                 <input  [formControlName]="'password'" type="password">
-            </div> 
+            </div>
             
-            <input [disabled]="!form.valid" type="submit" value="Sign up">
+            <div [hidden]="captcha">
+                <p>Hello potential human</p>
+                <re-captcha (resolved)="resolved($event)" siteKey="6LepB04jAAAAALhsR6ufvQAEkMXXupINYW_Bz5wW"></re-captcha>
+            </div>
+
+            <div [hidden]="!captcha">
+                <input  type="submit" value="Sign up">
+            </div>
+            
+            <!-- <input  type="submit" value="Sign up"> -->
         </form>
     </body>
 </html>
