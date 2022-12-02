@@ -44,6 +44,12 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 		return
 	}
 
+	if security.CheckBlacklistedPassword(user.Password) == true {
+		p.logger.Fatal("This password is unsafe  !")
+		security.WriteAsJson(rw, http.StatusBadRequest, "This password is unsafe !")
+		return
+	}
+
 	hashedPassword, _ := security.EncryptPassword(user.Password)
 	user.Password = hashedPassword
 	user.Email = strings.ToLower(user.Email)
