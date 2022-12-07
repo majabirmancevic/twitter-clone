@@ -22,8 +22,6 @@ func main() {
 		port = "8001"
 	}
 
-	//template.Must(template.ParseGlob("templates/*.html"))
-
 	// Initialize context
 	timeoutContext, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -52,9 +50,16 @@ func main() {
 	getRouter := router.Methods(http.MethodGet).Subrouter()
 	getRouter.HandleFunc("/", userHandler.GetAllRegularUsers)
 
+	deleteRouter := router.Methods(http.MethodDelete).Subrouter()
+	deleteRouter.HandleFunc("/", userHandler.DeleteAll)
+
 	postRouter := router.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/", userHandler.SignUp)
 	postRouter.Use(userHandler.MiddlewareUserDeserialization)
+
+	postBusinessRouter := router.Methods(http.MethodPost).Subrouter()
+	postBusinessRouter.HandleFunc("/business", userHandler.SignUpBusiness)
+	postBusinessRouter.Use(userHandler.MiddlewareBusinessUserDeserialization)
 
 	loginRouter := router.Methods(http.MethodPost).Subrouter()
 	loginRouter.HandleFunc("/login", userHandler.SignIn)
@@ -71,7 +76,7 @@ func main() {
 		gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "PATCH"}))
 
 	//Initialize the server
-	server := http.Server{
+	server := &http.Server{
 		Addr:         ":" + port,
 		Handler:      cors(router),
 		IdleTimeout:  120 * time.Second,

@@ -92,6 +92,31 @@ func (pr *AuthRepo) Insert(user *model.RegularProfile) error {
 	return nil
 }
 
+func (pr *AuthRepo) InsertBusiness(user *model.BusinessProfile) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	log.Println("-----------Ulazak u bazu")
+	usersCollection := pr.getCollection()
+
+	log.Println("----------KORISNICI--------")
+	log.Println(usersCollection)
+	result, err := usersCollection.InsertOne(ctx, &user)
+	log.Println("----rezultat---- ", result)
+	log.Println("----eror---- ", err)
+
+	log.Println("upisan korisnik sa ID-om : ", result.InsertedID)
+
+	if err != nil {
+		if er, ok := err.(mongo.WriteException); ok && er.WriteErrors[0].Code == 11000 {
+			return errors.New("User with that username already exist")
+		}
+		return err
+	}
+	pr.logger.Printf("Documents ID: %v\n", result.InsertedID)
+	pr.logger.Println(" --------- Kreiran korisnik sa korisnickim imenom ", user.Username)
+	return nil
+}
+
 func (pr *AuthRepo) GetByUsername(username string) (*model.RegularProfile, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -170,4 +195,8 @@ func (pr *AuthRepo) getCollection() *mongo.Collection {
 	userDatabase := pr.cli.Database("twitter")
 	userCollection := userDatabase.Collection("users")
 	return userCollection
+}
+
+func (pr *AuthRepo) DeleteAll() {
+	pr.getCollection().DeleteMany(context.TODO(), bson.D{{}})
 }

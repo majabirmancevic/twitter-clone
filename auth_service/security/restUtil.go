@@ -5,9 +5,10 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 )
 
 var (
@@ -50,7 +51,7 @@ func Decode(s string) (string, error) {
 }
 
 func CheckBlacklistedPassword(password string) bool {
-	passwords, err := loadPasswords()
+	passwords, err := LoadPasswords()
 	if err != nil {
 		return true
 	}
@@ -64,21 +65,29 @@ func CheckBlacklistedPassword(password string) bool {
 	return false
 }
 
-func loadPasswords() ([]string, error) {
-	pwd, _ := os.Getwd()
+func LoadPasswords() ([]string, error) {
 
-	file, err := os.Open(filepath.Join(pwd, "password_blacklist.txt"))
+	//path, _ := filepath.Abs("./auth_service/security/password_blacklist.txt")
+	//log.Println("ABS ", path)
+
+	file, err := os.Open("./auth_service/security/password_blacklist.txt")
 	if err != nil {
+		log.Fatal("ERROR ", err)
 		return []string{}, err
 	}
 
-	defer file.Close()
-
 	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
 
-	passwords := []string{}
+	var passwords []string
+
 	for scanner.Scan() {
 		passwords = append(passwords, scanner.Text())
+		//log.Println("FOR PETLJA ", len(passwords))
+	}
+
+	if err = file.Close(); err != nil {
+		fmt.Printf("Could not close the file due to this %s error \n", err)
 	}
 
 	return passwords, nil

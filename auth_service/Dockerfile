@@ -11,5 +11,6 @@ FROM alpine
 WORKDIR /root/
 COPY --from=builder /app/main .
 COPY  ./auth_service/certificates ./auth_service/certificates
+COPY ./auth_service/security/password_blacklist.txt ./auth_service/security/password_blacklist.txt
 EXPOSE 8001
 CMD ["./main"]

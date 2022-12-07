@@ -3,12 +3,9 @@ package security
 import (
 	"auth-service/model"
 	"crypto/tls"
-	"html/template"
-	"log"
-	"os"
-	"path/filepath"
-
 	"gopkg.in/gomail.v2"
+	"log"
+	"net/smtp"
 )
 
 type EmailData struct {
@@ -19,26 +16,26 @@ type EmailData struct {
 
 // 👇 Email template parser
 
-func ParseTemplateDir(dir string) (*template.Template, error) {
-	var paths []string
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() {
-			paths = append(paths, path)
-		}
-		return nil
-	})
+//func ParseTemplateDir(dir string) (*template.Template, error) {
+//	var paths []string
+//	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+//		if err != nil {
+//			return err
+//		}
+//		if !info.IsDir() {
+//			paths = append(paths, path)
+//		}
+//		return nil
+//	})
+//
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return template.ParseFiles(paths...)
+//}
 
-	if err != nil {
-		return nil, err
-	}
-
-	return template.ParseFiles(paths...)
-}
-
-func SendEmail(user *model.RegularProfile, data *EmailData) {
+func SendEmail(user *model.RegularProfile, data *EmailData) bool {
 
 	// Sender data.
 	from := "ibsit2022@gmail.com"
@@ -47,22 +44,6 @@ func SendEmail(user *model.RegularProfile, data *EmailData) {
 	to := user.Email
 	smtpHost := "smtp.gmail.com"
 	smtpPort := 587
-
-	//var body bytes.Buffer
-
-	//template, err := ParseTemplateDir("templates")
-	//if err != nil {
-	//	log.Fatal("Could not parse template", err)
-	//}
-	//
-	//template.ExecuteTemplate(&body, "verificationCode.html", &data)
-
-	//parsedTemplate, err := template.ParseFiles("auth_service/templates/verificationCode.html")
-	//parsedTemplate.Execute(&body, &data)
-	//if err != nil {
-	//	log.Println("Error executing template :", err)
-	//	return
-	//}
 
 	m := gomail.NewMessage()
 
@@ -77,8 +58,36 @@ func SendEmail(user *model.RegularProfile, data *EmailData) {
 
 	// Send Email
 	if err := d.DialAndSend(m); err != nil {
-		log.Println("---- GRESKA ---- ", err)
 		log.Fatal("Could not send email: ", err)
+		return false
 	}
 
+	return true
+}
+
+func SendMailSMTP(code string, name string) bool {
+
+	from := "ibsit2022@gmail.com"
+	password := "xeuloaiprwagrouh"
+
+	toEmailAddress := "ibsit2022@gmail.com"
+	to := []string{toEmailAddress}
+
+	host := "smtp.gmail.com"
+	port := "587"
+	address := host + ":" + port
+
+	subject := "Account verification for " + name + "\n"
+	body := "Your account verification code is " + code
+	message := []byte(subject + body)
+
+	auth := smtp.PlainAuth("", from, password, host)
+
+	err := smtp.SendMail(address, auth, from, to, message)
+	if err != nil {
+		panic(err)
+		return false
+	}
+
+	return true
 }

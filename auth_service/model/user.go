@@ -79,13 +79,28 @@ func NewUserResponse(user *RegularProfile) DBRegularResponse {
 
 // -------------------------------------------------------------------------------------------------------------
 type BusinessProfile struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CompanyName string             `bson:"companyName,omitempty" json:"companyName"`
-	Email       string             `bson:"email,omitempty" json:"email"`
-	WebSite     string             `bson:"webSite,omitempty" json:"webSite"`
-	Username    string             `bson:"username,omitempty" json:"username"`
-	Password    string             `bson:"password,omitempty" json:"password"`
+	ID               primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	CompanyName      string             `bson:"companyName,omitempty" json:"companyName"`
+	Email            string             `bson:"email,omitempty" json:"email"`
+	WebSite          string             `bson:"webSite,omitempty" json:"webSite"`
+	Username         string             `bson:"username,omitempty" json:"username"`
+	Password         string             `bson:"password,omitempty" json:"password"`
+	VerificationCode string             `bson:"verificationCode" json:"verificationCode" `
+	Verified         bool               `bson:"verified" json:"verified" `
+	Role             string             `json:"role" bson:"role"`
 }
+
+func (p *BusinessProfile) FromJSON(r io.Reader) error {
+	d := json.NewDecoder(r)
+	return d.Decode(p)
+}
+
+func (p *BusinessProfile) ToJSON(w io.Writer) error {
+	e := json.NewEncoder(w)
+	return e.Encode(p)
+}
+
+//---------------------------------------------------------------
 
 func (p *RegularProfiles) ToJSON(w io.Writer) error {
 	e := json.NewEncoder(w)

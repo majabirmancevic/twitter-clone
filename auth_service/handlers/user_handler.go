@@ -11,9 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"net/http"
-	"net/mail"
 	"strings"
-	"unicode"
 )
 
 type KeyUser struct{}
@@ -31,20 +29,28 @@ func NewAuthHandler(l *log.Logger, r *repository.AuthRepo) *AuthHandler {
 func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 	user := h.Context().Value(KeyUser{}).(*model.RegularProfile)
 
-	//if security.IsValid(user.Password) == false {
-	//	response := errors.New("the password is not in a valid format")
-	//	security.WriteAsJson(rw, http.StatusBadRequest, response)
-	//	return
-	//}
+	log.Println("STIGAO JE ZAHTEV ", h.Method)
+
 	user.Gender = strings.ToUpper(user.Gender)
-	if VerifyInputs(user.Name, user.Lastname, user.PlaceOfLiving, user.Username, user.Password, user.Email, user.Gender, user.Age) == false {
+
+	if security.VerifyInputs(user.Name, user.Lastname, user.PlaceOfLiving, user.Username, user.Password, user.Email, user.Gender, user.Age) == false {
+
 		p.logger.Println(user.Name, user.Lastname, user.PlaceOfLiving, user.Username, user.Password, user.Email, user.Gender, user.Age)
-		p.logger.Println(VerifyInputs(user.Name, user.Lastname, user.PlaceOfLiving, user.Username, user.Password, user.Email, user.Gender, user.Age))
+		p.logger.Println(security.VerifyInputs(user.Name, user.Lastname, user.PlaceOfLiving, user.Username, user.Password, user.Email, user.Gender, user.Age))
+
 		security.WriteAsJson(rw, http.StatusBadRequest, errors.New("your data input isn't valid"))
 		return
 	}
 
-	if security.CheckBlacklistedPassword(user.Password) == true {
+	p.logger.Println("PROVERA U BLEK LISTI ", security.CheckBlacklistedPassword(user.Password))
+	passwords, err := security.LoadPasswords()
+	log.Print(len(passwords))
+	//p.logger.Println("PRVIH 5 IZ BLEK LISTE ", passwords[0], passwords[1], passwords[2], passwords[3], passwords[4], passwords[5])
+	if err != nil {
+		http.Error(rw, "Can't read file", http.StatusInternalServerError)
+	}
+
+	if security.CheckBlacklistedPassword(user.Password) {
 		p.logger.Fatal("This password is unsafe  !")
 		security.WriteAsJson(rw, http.StatusBadRequest, "This password is unsafe !")
 		return
@@ -65,54 +71,125 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 		return
 	}
 
-	if found == nil || (found != nil && found.Username != user.Username) {
+	code := randstr.String(20)
+	verificationCode := security.Encode(code)
+	p.logger.Println("------- VERIFIKACIONI KOD KREIRAN ", verificationCode)
 
-		//if valid(user.Email) == false {
-		//	p.logger.Println("NEISPRAVNA EMAIL ADRESA !")
-		//	security.WriteAsJson(rw, http.StatusBadRequest, "Email is not valid !")
-		//	return
-		//}
-		// Generate Verification Code
-		code := randstr.String(20)
-		verificationCode := security.Encode(code)
-		p.logger.Println("------- VERIFIKACIONI KOD KREIRAN ", verificationCode)
+	user.VerificationCode = verificationCode
 
-		user.VerificationCode = verificationCode
+	p.logger.Println("------- SLANJE U BAZU")
+	error := p.repo.Insert(user)
+	if error != nil {
+		p.logger.Println(" ----- Error ", error)
+		security.WriteAsJson(rw, http.StatusBadRequest, "Neuspesno dodavanje korisnika !")
+		return
+	}
 
-		p.logger.Println("------- SLANJE U BAZU")
-		err := p.repo.Insert(user)
-		if err != nil {
-			p.logger.Println(" ----- Error ", err)
-			security.WriteAsJson(rw, http.StatusBadRequest, "Neuspesno dodavanje korisnika !")
-			return
-		}
+	var firstName = user.Name
 
-		var firstName = user.Name
+	if strings.Contains(firstName, " ") {
+		firstName = strings.Split(firstName, " ")[1]
+	}
 
-		if strings.Contains(firstName, " ") {
-			firstName = strings.Split(firstName, " ")[1]
-		}
+	//p.logger.Println("------- slanje mejla ")
+	//security.SendMailSMTP(code, firstName)
 
-		// 👇 Send Email
-		emailData := security.EmailData{
-			URL:       "Your account verification code is " + code,
-			FirstName: firstName,
-			Subject:   "Account verification",
-		}
+	// 👇 Send Email
+	emailData := security.EmailData{
+		URL:       "Your account verification code is " + code,
+		FirstName: firstName,
+		Subject:   "Account verification",
+	}
 
-		p.logger.Println("------- slanje mejla ", emailData)
-		security.SendEmail(user, &emailData)
+	p.logger.Println("------- slanje mejla ", emailData)
 
-		//security.WriteAsJson(rw, http.StatusCreated, model.NewUserResponse(user))
-
-		rw.WriteHeader(http.StatusCreated)
-		p.logger.Println("------- USPESNO KREIRAN KORISNIK")
-
+	if security.SendEmail(user, &emailData) {
+		//p.logger.Println("USPESNO ", security.SendEmail(user, &emailData))
+		security.WriteAsJson(rw, http.StatusCreated, nil)
+		return
+	} else {
+		security.WriteAsJson(rw, http.StatusInternalServerError, errors.New("something went wrong"))
+		return
 	}
 
 }
 
-// 	VERIFY EMAIL
+func (p *AuthHandler) SignUpBusiness(rw http.ResponseWriter, h *http.Request) {
+
+	user := h.Context().Value(KeyUser{}).(*model.BusinessProfile)
+	user.Email = strings.ToLower(user.Email)
+
+	if security.VerifyBusinessInputs(user.CompanyName, user.Email, user.WebSite, user.Username, user.Password) == false {
+
+		security.WriteAsJson(rw, http.StatusBadRequest, errors.New("your data input isn't valid"))
+		return
+	}
+
+	p.logger.Println("PROVERA U BLEK LISTI ", security.CheckBlacklistedPassword(user.Password))
+	passwords, err := security.LoadPasswords()
+	log.Print(len(passwords))
+	//p.logger.Println("PRVIH 5 IZ BLEK LISTE ", passwords[0], passwords[1], passwords[2], passwords[3], passwords[4], passwords[5])
+	if err != nil {
+		http.Error(rw, "Can't read file", http.StatusInternalServerError)
+	}
+
+	if security.CheckBlacklistedPassword(user.Password) {
+		p.logger.Fatal("This password is unsafe  !")
+		security.WriteAsJson(rw, http.StatusBadRequest, "This password is unsafe !")
+		return
+	}
+
+	hashedPassword, _ := security.EncryptPassword(user.Password)
+	user.Password = hashedPassword
+	user.ID = primitive.NewObjectID()
+	user.Role = "business"
+	user.Verified = false
+
+	found, _ := p.repo.GetByUsername(user.Username)
+
+	if found != nil && found.Username == user.Username {
+		p.logger.Fatal("This username is already used !")
+		security.WriteAsJson(rw, http.StatusBadRequest, "User already exist with this username !")
+		return
+	}
+
+	code := randstr.String(20)
+	verificationCode := security.Encode(code)
+	p.logger.Println("------- VERIFIKACIONI KOD KREIRAN ", verificationCode)
+
+	user.VerificationCode = verificationCode
+
+	p.logger.Println("------- SLANJE U BAZU")
+	error := p.repo.InsertBusiness(user)
+	if error != nil {
+		p.logger.Println(" ----- Error ", error)
+		security.WriteAsJson(rw, http.StatusBadRequest, "Neuspesno dodavanje korisnika !")
+		return
+	}
+
+	var firstName = user.CompanyName
+
+	if strings.Contains(firstName, " ") {
+		firstName = strings.Split(firstName, " ")[1]
+	}
+
+	//p.logger.Println("------- slanje mejla ")
+	//if security.SendMailSMTP(code, firstName) {
+	//
+	//}
+
+	//// 👇 Send Email
+	//emailData := security.EmailData{
+	//	URL:       "Your account verification code is " + code,
+	//	FirstName: firstName,
+	//	Subject:   "Account verification",
+	//}
+	//
+	//p.logger.Println("------- slanje mejla ", emailData)
+	//security.SendEmail(user, &emailData)
+
+	rw.WriteHeader(http.StatusCreated)
+}
 
 func (p *AuthHandler) VerifyEmail(rw http.ResponseWriter, h *http.Request) {
 	vars := mux.Vars(h)
@@ -165,7 +242,7 @@ func (p *AuthHandler) SignIn(rw http.ResponseWriter, h *http.Request) {
 		return
 	}
 
-	if (IsValidString(credentials.Username) && security.IsValid(credentials.Password)) == false {
+	if (security.IsValidString(credentials.Username) && security.IsValid(credentials.Password)) == false {
 		security.WriteError(rw, http.StatusBadRequest, errors.New("credentials are not valid "))
 		return
 	}
@@ -248,6 +325,23 @@ func (p *AuthHandler) MiddlewareUserDeserialization(next http.Handler) http.Hand
 	})
 }
 
+func (p *AuthHandler) MiddlewareBusinessUserDeserialization(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, h *http.Request) {
+		user := &model.BusinessProfile{}
+		err := user.FromJSON(h.Body)
+		if err != nil {
+			http.Error(rw, "Unable to decode json", http.StatusBadRequest)
+			p.logger.Fatal(err)
+			return
+		}
+
+		ctx := context.WithValue(h.Context(), KeyUser{}, user)
+		h = h.WithContext(ctx)
+
+		next.ServeHTTP(rw, h)
+	})
+}
+
 func (p *AuthHandler) MiddlewareLoginDeserialization(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, h *http.Request) {
 		req := &model.SignInRequest{}
@@ -270,44 +364,22 @@ func (p *AuthHandler) MiddlewareContentTypeSet(next http.Handler) http.Handler {
 		p.logger.Println("Method [", h.Method, "] - Hit path :", h.URL.Path)
 
 		rw.Header().Add("Content-Type", "application/json")
-		//rw.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		//rw.Header().Set("Access-Control-Allow-Origin", "*")
+		rw.Header().Add("Access-Control-Allow-Headers", "Content-Type,Origin,Content-Type, Accept, Authorization")
+		rw.Header().Add("Access-Control-Allow-Origin", "*")
 
+		if h.Method == "OPTIONS" {
+			rw.Header().Add("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH")
+			rw.WriteHeader(http.StatusOK)
+		}
 		//rw.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 		next.ServeHTTP(rw, h)
+
 	})
 }
 
-func Valid(email string) bool {
-	_, err := mail.ParseAddress(email)
-	return err == nil
-}
+func (p *AuthHandler) DeleteAll(rw http.ResponseWriter, h *http.Request) {
 
-func IsValidString(s string) bool {
-
-	for _, char := range s {
-
-		if (unicode.IsLetter(char) == true) && (strings.ContainsAny(s, "<>*()/") == false) {
-			return true
-		}
-	}
-	return false
-}
-
-func VerifyInputs(name string, lastaname string, placeOfLiving string, username string, password string, email string, gender string, age int32) bool {
-	log.Println("NAME ", IsValidString(name))
-	log.Println("LASTNAME ", IsValidString(lastaname))
-	log.Println("PLACE OF LIVING ", IsValidString(placeOfLiving))
-	log.Println("USERNAME ", IsValidString(username))
-	log.Println("PASSWORD ", security.IsValid(password))
-	log.Println("EMAIL ", Valid(email))
-	log.Println("GENDER ", IsValidString(gender))
-	log.Println("GENDER M/F ", strings.Contains(gender, "M") || strings.Contains(gender, "F"))
-	log.Println("AGE ", age >= 13)
-
-	if IsValidString(name) && IsValidString(lastaname) && IsValidString(placeOfLiving) && IsValidString(username) && security.IsValid(password) && Valid(email) && (IsValidString(gender) && (strings.Contains(gender, "M") || strings.Contains(gender, "F"))) && (age >= 13) {
-		return true
-	}
-	return false
+	p.repo.DeleteAll()
+	rw.WriteHeader(http.StatusNoContent)
 }
