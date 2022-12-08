@@ -105,11 +105,11 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 
 	if security.SendEmail(user, &emailData) {
 		//p.logger.Println("USPESNO ", security.SendEmail(user, &emailData))
-		security.WriteAsJson(rw, http.StatusCreated, nil)
-		return
+		security.WriteAsJson(rw, http.StatusCreated, "neki string")
+		p.logger.Println("------- poslat response ", emailData)
 	} else {
 		security.WriteAsJson(rw, http.StatusInternalServerError, errors.New("something went wrong"))
-		return
+		p.logger.Println("------- poslat response ", emailData)
 	}
 
 }

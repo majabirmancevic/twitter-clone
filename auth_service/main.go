@@ -17,9 +17,9 @@ func main() {
 
 	//Reading from environment, if not set we will default it to 8080.
 	//This allows flexibility in different environments (for eg. when running multiple docker api's and want to override the default port)
-	port := os.Getenv("PORT")
+	port := os.Getenv("API_GATE_PORT")
 	if len(port) == 0 {
-		port = "8001"
+		port = "8000"
 	}
 
 	// Initialize context
