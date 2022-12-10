@@ -5,10 +5,12 @@ import (
 	"auth-service/repository"
 	"auth-service/security"
 	"context"
+	"crypto/tls"
 	"errors"
 	"github.com/gorilla/mux"
 	"github.com/thanhpk/randstr"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"gopkg.in/gomail.v2"
 	"log"
 	"net/http"
 	"strings"
@@ -38,21 +40,21 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 		p.logger.Println(user.Name, user.Lastname, user.PlaceOfLiving, user.Username, user.Password, user.Email, user.Gender, user.Age)
 		p.logger.Println(security.VerifyInputs(user.Name, user.Lastname, user.PlaceOfLiving, user.Username, user.Password, user.Email, user.Gender, user.Age))
 
-		security.WriteAsJson(rw, http.StatusBadRequest, errors.New("your data input isn't valid"))
+		http.Error(rw, "your data input isn't valid", http.StatusInternalServerError)
 		return
 	}
 
-	p.logger.Println("PROVERA U BLEK LISTI ", security.CheckBlacklistedPassword(user.Password))
-	passwords, err := security.LoadPasswords()
-	log.Print(len(passwords))
+	//p.logger.Println("PROVERA U BLEK LISTI ", security.CheckBlacklistedPassword(user.Password))
+	//passwords, err := security.LoadPasswords()
+	//log.Print(len(passwords))
 	//p.logger.Println("PRVIH 5 IZ BLEK LISTE ", passwords[0], passwords[1], passwords[2], passwords[3], passwords[4], passwords[5])
-	if err != nil {
-		http.Error(rw, "Can't read file", http.StatusInternalServerError)
-	}
+	//if err != nil {
+	//	http.Error(rw, "Can't read file", http.StatusInternalServerError)
+	//}
 
 	if security.CheckBlacklistedPassword(user.Password) {
 		p.logger.Fatal("This password is unsafe  !")
-		security.WriteAsJson(rw, http.StatusBadRequest, "This password is unsafe !")
+		http.Error(rw, "This password is unsafe !", http.StatusBadRequest)
 		return
 	}
 
@@ -67,7 +69,7 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 
 	if found != nil && found.Username == user.Username {
 		p.logger.Fatal("This username is already used !")
-		security.WriteAsJson(rw, http.StatusBadRequest, "User already exist with this username !")
+		http.Error(rw, "User already exist with this username !", http.StatusBadRequest)
 		return
 	}
 
@@ -81,12 +83,11 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 	error := p.repo.Insert(user)
 	if error != nil {
 		p.logger.Println(" ----- Error ", error)
-		security.WriteAsJson(rw, http.StatusBadRequest, "Neuspesno dodavanje korisnika !")
+		http.Error(rw, "Neuspesno dodavanje korisnika !", http.StatusBadRequest)
 		return
 	}
 
 	var firstName = user.Name
-
 	if strings.Contains(firstName, " ") {
 		firstName = strings.Split(firstName, " ")[1]
 	}
@@ -104,12 +105,12 @@ func (p *AuthHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 	p.logger.Println("------- slanje mejla ", emailData)
 
 	if security.SendEmail(user, &emailData) {
-		//p.logger.Println("USPESNO ", security.SendEmail(user, &emailData))
-		security.WriteAsJson(rw, http.StatusCreated, "neki string")
-		p.logger.Println("------- poslat response ", emailData)
+		rw.WriteHeader(http.StatusCreated)
+		rw.Write([]byte("Success"))
+		p.logger.Println("Uspesno slanje maila", emailData)
 	} else {
-		security.WriteAsJson(rw, http.StatusInternalServerError, errors.New("something went wrong"))
-		p.logger.Println("------- poslat response ", emailData)
+		http.Error(rw, "Neuspesno dodavanje korisnika !", http.StatusInternalServerError)
+		p.logger.Println("------- poslat 500 response ", emailData)
 	}
 
 }
@@ -121,21 +122,22 @@ func (p *AuthHandler) SignUpBusiness(rw http.ResponseWriter, h *http.Request) {
 
 	if security.VerifyBusinessInputs(user.CompanyName, user.Email, user.WebSite, user.Username, user.Password) == false {
 
-		security.WriteAsJson(rw, http.StatusBadRequest, errors.New("your data input isn't valid"))
+		http.Error(rw, "your data input isn't valid", http.StatusBadRequest)
 		return
 	}
 
-	p.logger.Println("PROVERA U BLEK LISTI ", security.CheckBlacklistedPassword(user.Password))
-	passwords, err := security.LoadPasswords()
-	log.Print(len(passwords))
+	//p.logger.Println("PROVERA U BLEK LISTI ", security.CheckBlacklistedPassword(user.Password))
+	//passwords, err := security.LoadPasswords()
+	//log.Print(len(passwords))
 	//p.logger.Println("PRVIH 5 IZ BLEK LISTE ", passwords[0], passwords[1], passwords[2], passwords[3], passwords[4], passwords[5])
-	if err != nil {
-		http.Error(rw, "Can't read file", http.StatusInternalServerError)
-	}
+	//if err != nil {
+	//	http.Error(rw, "Can't read file", http.StatusInternalServerError)
+	//	return
+	//}
 
 	if security.CheckBlacklistedPassword(user.Password) {
 		p.logger.Fatal("This password is unsafe  !")
-		security.WriteAsJson(rw, http.StatusBadRequest, "This password is unsafe !")
+		http.Error(rw, "This password is unsafe !", http.StatusBadRequest)
 		return
 	}
 
@@ -149,7 +151,7 @@ func (p *AuthHandler) SignUpBusiness(rw http.ResponseWriter, h *http.Request) {
 
 	if found != nil && found.Username == user.Username {
 		p.logger.Fatal("This username is already used !")
-		security.WriteAsJson(rw, http.StatusBadRequest, "User already exist with this username !")
+		http.Error(rw, "User already exist with this username !", http.StatusBadRequest)
 		return
 	}
 
@@ -163,12 +165,11 @@ func (p *AuthHandler) SignUpBusiness(rw http.ResponseWriter, h *http.Request) {
 	error := p.repo.InsertBusiness(user)
 	if error != nil {
 		p.logger.Println(" ----- Error ", error)
-		security.WriteAsJson(rw, http.StatusBadRequest, "Neuspesno dodavanje korisnika !")
+		http.Error(rw, "Neuspesno dodavanje korisnika !", http.StatusBadRequest)
 		return
 	}
 
 	var firstName = user.CompanyName
-
 	if strings.Contains(firstName, " ") {
 		firstName = strings.Split(firstName, " ")[1]
 	}
@@ -189,6 +190,76 @@ func (p *AuthHandler) SignUpBusiness(rw http.ResponseWriter, h *http.Request) {
 	//security.SendEmail(user, &emailData)
 
 	rw.WriteHeader(http.StatusCreated)
+}
+
+func (p *AuthHandler) SendingMailTest(w http.ResponseWriter, h *http.Request) {
+	//from := "ibsit2022@gmail.com"
+	//password := "xeuloaiprwagrouh"
+	//
+	//toEmailAddress := "ibsit2022@gmail.com"
+	//to := []string{toEmailAddress}
+	//
+	//host := "smtp.gmail.com"
+	//port := "587"
+	//address := host + ":" + port
+
+	code := randstr.String(20)
+	emailData := security.EmailData{
+		URL: "Your account verification code is " + code,
+		//FirstName: firstName,
+		Subject: "Account verification",
+	}
+
+	//subject := "To: ibsit2022@gmail.com\r\n" + "Account verification \r\n"
+	//body := "Your account verification code is " + code
+	//message := []byte(subject + body)
+	//
+	//auth := smtp.PlainAuth("", from, password, host)
+	//log.Println("AUTH => ", auth)
+	//
+	//err := smtp.SendMail(address, auth, from, to, message)
+	//log.Println("ERROR => ", err)
+	//if err != nil {
+	//	panic(err)
+	//	log.Println(" ---- Greska -> ", err.Error())
+	//	http.Error(w, "Neuspesno slanje mejla!", http.StatusBadRequest)
+	//	return
+	//}
+
+	from := "ibsit2022@gmail.com"
+	smtpPass := "xeuloaiprwagrouh"
+	smtpUser := "ibsit2022@gmail.com"
+	to := []string{"ibsit2022@gmail.com"}
+	smtpHost := "smtp.gmail.com"
+	smtpPort := 587
+
+	m := gomail.NewMessage()
+
+	m.SetHeader("From", from)
+	m.SetHeader("To", to[0])
+	m.SetHeader("Subject", emailData.Subject)
+	m.SetBody("text/html", emailData.URL)
+
+	d := gomail.NewDialer(smtpHost, smtpPort, smtpUser, smtpPass)
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	d.TLSConfig = &tls.Config{}
+	dial, err := d.Dial()
+	if err != nil {
+		log.Fatal("ERROR: ", err)
+	}
+
+	dial.Send(from, to, m)
+
+	log.Println("HOST-> ", d.Host, " PORT-> ", d.Port, " LOCALNAME-> ", d.LocalName, " SSL-> ", d.SSL, " TLSCONFIG-> ", d.TLSConfig)
+
+	// Send Email
+	//if err := d.DialAndSend(m); err != nil {
+	//	log.Fatal("Could not send email: ", err)
+	//}
+
+	w.WriteHeader(http.StatusOK)
+	dial.Close()
+	log.Println(" ---- Uspesno poslat mejl  ")
 }
 
 func (p *AuthHandler) VerifyEmail(rw http.ResponseWriter, h *http.Request) {
@@ -273,7 +344,7 @@ func (p *AuthHandler) SignIn(rw http.ResponseWriter, h *http.Request) {
 	}
 
 	log.Println("--------Kreiranje tokena-------- ")
-	token, err := security.NewToken(user.ID.Hex())
+	token, err := security.NewToken(user.Username)
 	log.Println("--------NewToken ERROR : ", err)
 	if err != nil {
 		log.Println("Token cannot be created", err.Error())
@@ -364,13 +435,13 @@ func (p *AuthHandler) MiddlewareContentTypeSet(next http.Handler) http.Handler {
 		p.logger.Println("Method [", h.Method, "] - Hit path :", h.URL.Path)
 
 		rw.Header().Add("Content-Type", "application/json")
-		rw.Header().Add("Access-Control-Allow-Headers", "Content-Type,Origin,Content-Type, Accept, Authorization")
-		rw.Header().Add("Access-Control-Allow-Origin", "*")
+		//rw.Header().Add("Access-Control-Allow-Headers", "Content-Type,Origin,Content-Type, Accept, Authorization")
+		//rw.Header().Add("Access-Control-Allow-Origin", "*")
 
-		if h.Method == "OPTIONS" {
-			rw.Header().Add("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH")
-			rw.WriteHeader(http.StatusOK)
-		}
+		//if h.Method == "OPTIONS" {
+		//	rw.Header().Add("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH")
+		//	rw.WriteHeader(http.StatusOK)
+		//}
 		//rw.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 		next.ServeHTTP(rw, h)

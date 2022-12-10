@@ -23,13 +23,10 @@
 </div>
 
 <div *ngIf="counters" class="tweet-counters">
-    <div> <span>{{tweet.retweetCounter}}</span>   Retweets</div>
     <div> <span>{{tweet.likeCounter}}</span>   Likes</div>
 </div>
 
 <div *ngIf="footer" class="tweet-footer">
-    
-    <app-reply [tweet]="tweet"></app-reply>
     
     <app-like [tweet]="tweet"></app-like>
     

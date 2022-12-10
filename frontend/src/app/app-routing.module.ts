@@ -8,6 +8,7 @@ import { SignUpComponent } from './pages/landing-page/sign-up/sign-up.component'
 import { ProfilePageComponent } from './pages/profile-page/profile-page.component';
 import { TweetPageComponent } from './pages/tweet-page/tweet-page.component';
 import { AuthGuard } from './services/auth.guard';
+import { EmailInfoComponent } from './pages/landing-page/email-info/email-info.component';
 
 const routes: Routes = [
   {path : "" , component: LandingPageComponent},
@@ -15,6 +16,7 @@ const routes: Routes = [
   {path : "sign-up" , component: SignUpComponent},
   {path : "verify-email" , component: EmailConfirmComponent },
     // children: [{path : ":code" , component: EmailConfirmComponent}]
+  {path : "email-info" , component: EmailInfoComponent },
   {path : "home" , component: HomePageComponent, canActivate: [AuthGuard]},
   {path : "tweet/:id" , component: TweetPageComponent, canActivate: [AuthGuard]},
   {path : "profile/tweets" , component: ProfilePageComponent, canActivate: [AuthGuard]},

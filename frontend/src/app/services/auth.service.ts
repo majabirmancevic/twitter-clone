@@ -25,7 +25,7 @@ export class AuthService {
     }); 
     const options = { headers: headers };
        
-    return this.http.post("https://localhost:8001/", JSON.stringify(payload), options);
+    return this.http.post("https://localhost:8001/", JSON.stringify(payload), { headers: headers });
   }
   
   signIn(payload: SignInRequestPayload) {
@@ -39,9 +39,9 @@ export class AuthService {
 
     return this.http.post<SignInResponsePayload>("https://localhost:8001/login", JSON.stringify(payload), options).pipe<SignInResponsePayload>(
       map(response=>{
-        self.localStorage.store("token", response.token);
-        self.localStorage.store("username", response.user.username);
-        self.localStorage.store("isLoggedIn", true);
+        localStorage.setItem("token", response.token);
+        localStorage.setItem("username", response.user.username);
+        localStorage.setItem("isLoggedIn", "true");
         return response;
       })
     )
@@ -89,7 +89,7 @@ export class AuthService {
   }
 
   getAccessToken() {
-    return this.localStorage.retrieve("accessToken");
+    return this.localStorage.retrieve("token");
   }
   
   // findAllUsernames(): Observable<String[]> {

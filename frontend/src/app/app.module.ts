@@ -5,7 +5,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LikeComponent } from './like/like.component';
-import { ReplyComponent } from './reply/reply.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'
 
@@ -25,13 +24,13 @@ import { TokenInterceptor } from './services/token-interceptor';
 import { NgxWebstorageModule } from 'ngx-webstorage';
 import { EmailConfirmComponent } from './pages/landing-page/email-confirm/email-confirm.component';
 import { RecaptchaModule} from 'ng-recaptcha';
+import { EmailInfoComponent } from './pages/landing-page/email-info/email-info.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     LikeComponent,
-    ReplyComponent,
     TweetComponent,
     TweetPageComponent,
     HomePageComponent,
@@ -40,7 +39,8 @@ import { RecaptchaModule} from 'ng-recaptcha';
     SignInComponent,
     SignUpComponent,
     NavbarComponent,
-    EmailConfirmComponent
+    EmailConfirmComponent,
+    EmailInfoComponent
   ],
   imports: [
     BrowserModule,

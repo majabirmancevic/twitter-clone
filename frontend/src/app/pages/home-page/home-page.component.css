@@ -8,10 +8,13 @@ body{
     
     padding-left: 10px;
     padding-bottom: 10px;
+    margin-top: 10px;
     height: 200px;
     display: flex;
     border-left: 1px solid lightgray;
     border-right: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+    border-top: 1px solid lightgray;
 }
 
 .tweet-form{

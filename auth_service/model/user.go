@@ -57,8 +57,8 @@ type SignInRequest struct {
 }
 
 type SignInResponseRegular struct {
-	Token          string            `bson:"token" json:"token" `
-	RegularProfile DBRegularResponse `bson:"user" json:"user" `
+	Token string `bson:"token" json:"token" `
+	//RegularProfile DBRegularResponse `bson:"user" json:"user" `
 }
 
 func NewUserResponse(user *RegularProfile) DBRegularResponse {

@@ -17,7 +17,7 @@ func main() {
 
 	//Reading from environment, if not set we will default it to 8080.
 	//This allows flexibility in different environments (for eg. when running multiple docker api's and want to override the default port)
-	port := os.Getenv("API_GATE_PORT")
+	port := os.Getenv("PORT")
 	if len(port) == 0 {
 		port = "8000"
 	}
@@ -67,6 +67,9 @@ func main() {
 
 	verifyRouter := router.Methods(http.MethodGet).Subrouter()
 	verifyRouter.HandleFunc("/verifyEmail/{code}", userHandler.VerifyEmail)
+
+	emailRouter := router.Methods(http.MethodGet).Subrouter()
+	emailRouter.HandleFunc("/sendMail", userHandler.SendingMailTest)
 
 	// ZA PROVERU PRISTUPA RUTA NA OSNOVU TOKENA
 	//middlewares.Authenticate(userHandler.SignIn)

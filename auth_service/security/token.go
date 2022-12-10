@@ -16,10 +16,10 @@ var (
 	jwtSecretKey    = []byte(os.Getenv("JWT_SECRET_KEY"))
 )
 
-func NewToken(userId string) (string, error) {
+func NewToken(username string) (string, error) {
 	claims := &jwt.StandardClaims{
 		ExpiresAt: time.Now().Add(time.Minute * 60).Unix(),
-		Issuer:    userId,
+		Issuer:    username,
 		IssuedAt:  time.Now().Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -50,6 +50,7 @@ func ParseToken(tokenString string) (*jwt.Token, error) {
 
 type TokenPayload struct {
 	UserId    string
+	Username  string
 	CreatedAt time.Time
 	ExpiresAt time.Time
 }
@@ -64,10 +65,12 @@ func NewTokenPayload(tokenString string) (*TokenPayload, error) {
 		return nil, ErrInvalidToken
 	}
 	id, _ := claims["iss"].(string)
+	username, _ := claims["username"].(string)
 	createdAt, _ := claims["iat"].(float64)
 	expiresAt, _ := claims["exp"].(float64)
 	return &TokenPayload{
 		UserId:    id,
+		Username:  username,
 		CreatedAt: time.Unix(int64(createdAt), 0),
 		ExpiresAt: time.Unix(int64(expiresAt), 0),
 	}, nil

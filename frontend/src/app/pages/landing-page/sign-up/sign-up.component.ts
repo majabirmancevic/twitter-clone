@@ -66,16 +66,17 @@ export class SignUpComponent implements OnInit {
     this.payload.password = this.form.get('password')?.value;
     const self = this;
     
+    
+    self.router.navigate(['/verify-email'], { queryParams: { registered: 'true', verified: 'false' } });
+    //self.toastr.info("Check your email address!");
     this.authService.signUp(this.payload).subscribe({
-      next() {
-        self.router.navigate(['/verify-email'], { queryParams: { registered: 'true', verified: 'false' } });
-      },
+      next() {},
       complete(){},
       error(error) {
         console.log(error);
         console.log("------- GRESKA -------")
         console.log(error.code)
-        self.toastr.error("Something went wrong!");
+        //self.toastr.error("Something went wrong!");
       }
     })
   }
