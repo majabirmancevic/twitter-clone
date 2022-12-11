@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule} from '@angular/forms';
+import {ReactiveFormsModule} from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,6 +17,7 @@ import { LandingPageComponent } from './pages/landing-page/landing-page.componen
 import { ImageCropperModule } from 'ngx-image-cropper';
 import { SignInComponent } from './pages/landing-page/sign-in/sign-in.component';
 import { SignUpComponent } from './pages/landing-page/sign-up/sign-up.component';
+import { SignUpBusinessComponent } from './pages/landing-page/sign-up-business/sign-up-business.component';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavbarComponent } from './navbar/navbar.component';
@@ -40,20 +42,23 @@ import { EmailInfoComponent } from './pages/landing-page/email-info/email-info.c
     SignUpComponent,
     NavbarComponent,
     EmailConfirmComponent,
-    EmailInfoComponent
+    EmailInfoComponent,
+    SignUpBusinessComponent,
   ],
+
+    
   imports: [
     BrowserModule,
     AppRoutingModule,
     FontAwesomeModule,
     HttpClientModule,
-    ReactiveFormsModule,
     ImageCropperModule,
     ToastrModule.forRoot(),
     BrowserAnimationsModule,
     NgxWebstorageModule.forRoot(),
-    RecaptchaModule
-  
+    RecaptchaModule,
+    FormsModule,
+    ReactiveFormsModule,
   ],
   providers: [
     AuthGuard,

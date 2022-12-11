@@ -30,17 +30,17 @@ export class AuthService {
   }
   
   
-  // signUpBusiness(payload: SignUpPayloadBusiness) {
+  signUpBusiness(payload: SignUpPayloadBusiness) {
 
-  //   const headers = new HttpHeaders({
-  //     'Accept': 'application/json',
-  //     'Content-Type': 'application/json',
+    const headers = new HttpHeaders({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
 
-  //   }); 
-  //   const options = { headers: headers };
+    }); 
+    const options = { headers: headers };
        
-  //   return this.http.post("https://localhost:8002/business", JSON.stringify(payload), { headers: headers });
-  // }
+    return this.http.post("https://localhost:8002/business", JSON.stringify(payload), { headers: headers });
+  }
 
   signIn(payload: SignInRequestPayload) {
 
