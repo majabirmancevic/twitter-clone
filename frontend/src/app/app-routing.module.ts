@@ -10,6 +10,7 @@ import { TweetPageComponent } from './pages/tweet-page/tweet-page.component';
 import { AuthGuard } from './services/auth.guard';
 import { EmailInfoComponent } from './pages/landing-page/email-info/email-info.component';
 
+
 const routes: Routes = [
   {path : "" , component: LandingPageComponent},
   {path : "sign-in" , component: SignInComponent},
