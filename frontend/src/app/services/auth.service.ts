@@ -25,7 +25,7 @@ export class AuthService {
     }); 
     const options = { headers: headers };
        
-    return this.http.post("https://localhost:8001/", JSON.stringify(payload), { headers: headers });
+    return this.http.post("https://localhost:8002/", JSON.stringify(payload), { headers: headers });
   }
   
   signIn(payload: SignInRequestPayload) {
@@ -40,7 +40,7 @@ export class AuthService {
     return this.http.post<SignInResponsePayload>("https://localhost:8001/login", JSON.stringify(payload), options).pipe<SignInResponsePayload>(
       map(response=>{
         localStorage.setItem("token", response.token);
-        localStorage.setItem("username", response.user.username);
+        localStorage.setItem("username", response.username);
         localStorage.setItem("isLoggedIn", "true");
         return response;
       })
@@ -53,29 +53,35 @@ export class AuthService {
       'Content-Type': 'application/json'
     }); 
     const options = { headers: headers };
-    return this.http.get(`https://localhost:8001/verifyEmail/${code}`,  options);
+    return this.http.get(`https://localhost:8002/verifyEmail/${code}`,  options);
     
   }
-  
-  logout() {
-    const self = this;
-    return this.http.post("http://localhost:8080/auth/logout", {username: this.getUsername(), refreshToken: this.localStorage.retrieve("refreshToken")}).subscribe({complete(){
 
-      self.localStorage.clear('accessToken');
-      self.localStorage.clear('refreshToken');
-      self.localStorage.clear('expiresAt');
-      self.localStorage.clear('username');
-      self.localStorage.store('isLoggedIn', false);
-      self.router.navigateByUrl("");
-    }});
-  }
+  
+  
+  // logout() {
+  //   const self = this;
+  //   return this.http.post("http://localhost:8080/auth/logout", {username: this.getUsername(), refreshToken: this.localStorage.retrieve("refreshToken")}).subscribe({complete(){
+
+  //     self.localStorage.clear('accessToken');
+  //     self.localStorage.clear('refreshToken');
+  //     self.localStorage.clear('expiresAt');
+  //     self.localStorage.clear('username');
+  //     self.localStorage.store('isLoggedIn', false);
+  //     self.router.navigateByUrl("");
+  //   }});
+  // }
   
   getUsername(){
-    return this.localStorage.retrieve("username");
+    return localStorage.getItem("username");
   }
+
+  // getUsernameByToken(){
+  //   return JSON.parse(this.localStorage.retrieve("token")).username
+  // }
   
   isLoggedIn() {
-    return this.localStorage.retrieve("isLoggedIn");
+    return localStorage.getItem("isLoggedIn") == "true";
   }
 
   refreshAccessToken(): Observable<SignInResponsePayload> {

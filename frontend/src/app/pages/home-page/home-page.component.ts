@@ -18,7 +18,7 @@ export class HomePageComponent implements OnInit {
   newTweetForm: FormGroup;
   payload: PostRequest;
   tweets: Array<PostResponse>;
-  username: string;
+  username: string | null;
 
   constructor(
     private activatedRoute: ActivatedRoute,

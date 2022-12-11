@@ -25,6 +25,7 @@ import { NgxWebstorageModule } from 'ngx-webstorage';
 import { EmailConfirmComponent } from './pages/landing-page/email-confirm/email-confirm.component';
 import { RecaptchaModule} from 'ng-recaptcha';
 import { EmailInfoComponent } from './pages/landing-page/email-info/email-info.component';
+import { BusinessProfilePageComponent } from './pages/business-profile-page/business-profile-page.component';
 
 
 @NgModule({
@@ -40,7 +41,8 @@ import { EmailInfoComponent } from './pages/landing-page/email-info/email-info.c
     SignUpComponent,
     NavbarComponent,
     EmailConfirmComponent,
-    EmailInfoComponent
+    EmailInfoComponent,
+    BusinessProfilePageComponent
   ],
   imports: [
     BrowserModule,

@@ -70,7 +70,7 @@ func LoadPasswords() ([]string, error) {
 	//path, _ := filepath.Abs("./auth_service/security/password_blacklist.txt")
 	//log.Println("ABS ", path)
 
-	file, err := os.Open("./auth_service/security/password_blacklist.txt")
+	file, err := os.Open("./profile_service/security/password_blacklist.txt")
 	if err != nil {
 		log.Fatal("ERROR ", err)
 		return []string{}, err

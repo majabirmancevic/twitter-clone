@@ -19,7 +19,7 @@ const routes: Routes = [
   {path : "email-info" , component: EmailInfoComponent },
   {path : "home" , component: HomePageComponent, canActivate: [AuthGuard]},
   {path : "tweet/:id" , component: TweetPageComponent, canActivate: [AuthGuard]},
-  {path : "profile/tweets" , component: ProfilePageComponent, canActivate: [AuthGuard]},
+  {path : "profile/:username" , component: ProfilePageComponent, canActivate: [AuthGuard]},
   {path : "profile/likes" , component: ProfilePageComponent, canActivate: [AuthGuard]},
   {path : "profile/update" , component: ProfilePageComponent, canActivate: [AuthGuard]},
 

@@ -1,7 +1,7 @@
-import { User } from "src/app/user-model";
+import { RegularUser } from "src/app/user-model";
 
 export interface SignInResponsePayload{
     token: string;
-    user: User;
+    username: string;
     //expiresAt: Date
 }

@@ -10,9 +10,8 @@
             </div>
             
   
-            <div [routerLink]="'/profile/tweets'" class="sidebar-item" 
-            [ngClass]="{'active': getUrl() === '/profile/tweets' || getUrl() === '/profile/replies' || getUrl() === '/profile/likes'}">
-                <img src="assets/svg/profile.svg" class="sidebar-item-icon">
+            <div  class="sidebar-item" (click)="navigate()" >     
+                <img src="assets/svg/profile.svg" class="sidebar-item-icon" >
                 <div class="icon-label">Profile</div>
             </div>
             

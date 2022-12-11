@@ -353,7 +353,8 @@ func (p *AuthHandler) SignIn(rw http.ResponseWriter, h *http.Request) {
 	}
 
 	response := model.SignInResponseRegular{
-		Token: token,
+		Token:    token,
+		Username: user.Username,
 		//RegularProfile: model.NewUserResponse(user),
 	}
 

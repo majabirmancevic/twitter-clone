@@ -1,9 +1,12 @@
-export interface User{
-    firstName: string;
-    lastName: string;
+export interface RegularUser{
+    name: string;
+    lastname: string;
+    gender : string;
+    age: number;
+    placeOfLiving: string;
+    email: string;
     username: string;
-    bio: string;
-    location: string;
-    personalWebsite: string ;
-    birthDate: string;
+    verified:boolean;
+    role:string;
 }
+

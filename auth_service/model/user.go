@@ -57,7 +57,8 @@ type SignInRequest struct {
 }
 
 type SignInResponseRegular struct {
-	Token string `bson:"token" json:"token" `
+	Token    string `bson:"token" json:"token" `
+	Username string `bson:"username" json:"username" `
 	//RegularProfile DBRegularResponse `bson:"user" json:"user" `
 }
 

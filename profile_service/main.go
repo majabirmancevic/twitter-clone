@@ -1,8 +1,6 @@
 package main
 
 import (
-	"auth-service/handlers"
-	"auth-service/repository"
 	"context"
 	gorillaHandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -10,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"profile_service/handlers"
+	"profile_service/repository"
 	"time"
 )
 
@@ -17,9 +17,9 @@ func main() {
 
 	//Reading from environment, if not set we will default it to 8080.
 	//This allows flexibility in different environments (for eg. when running multiple docker api's and want to override the default port)
-	port := os.Getenv("PORT")
+	port := os.Getenv("PROFILE_PORT")
 	if len(port) == 0 {
-		port = "8000"
+		port = "8002"
 	}
 
 	// Initialize context
@@ -40,18 +40,10 @@ func main() {
 	// NoSQL: Checking if the connection was established
 	store.Ping()
 
-	//Initialize the handler and inject said logger
-	userHandler := handlers.NewAuthHandler(logger, store)
+	userHandler := handlers.NewProfileHandler(logger, store)
 
-	//Initialize the router and add a middleware for all the requests
 	router := mux.NewRouter()
-	router.Use(userHandler.MiddlewareContentTypeSet)
-
-	getRouter := router.Methods(http.MethodGet).Subrouter()
-	getRouter.HandleFunc("/", userHandler.GetAllRegularUsers)
-
-	deleteRouter := router.Methods(http.MethodDelete).Subrouter()
-	deleteRouter.HandleFunc("/", userHandler.DeleteAll)
+	//router.Use(userHandler.MiddlewareContentTypeSet)
 
 	postRouter := router.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/", userHandler.SignUp)
@@ -61,15 +53,11 @@ func main() {
 	postBusinessRouter.HandleFunc("/business", userHandler.SignUpBusiness)
 	postBusinessRouter.Use(userHandler.MiddlewareBusinessUserDeserialization)
 
-	loginRouter := router.Methods(http.MethodPost).Subrouter()
-	loginRouter.HandleFunc("/login", userHandler.SignIn)
-	loginRouter.Use(userHandler.MiddlewareLoginDeserialization)
-
 	verifyRouter := router.Methods(http.MethodGet).Subrouter()
 	verifyRouter.HandleFunc("/verifyEmail/{code}", userHandler.VerifyEmail)
 
-	emailRouter := router.Methods(http.MethodGet).Subrouter()
-	emailRouter.HandleFunc("/sendMail", userHandler.SendingMailTest)
+	getUserRouter := router.Methods(http.MethodGet).Subrouter()
+	getUserRouter.HandleFunc("/user/{username}", userHandler.GetRegularUser)
 
 	// ZA PROVERU PRISTUPA RUTA NA OSNOVU TOKENA
 	//middlewares.Authenticate(userHandler.SignIn)
@@ -88,7 +76,7 @@ func main() {
 	}
 
 	logger.Println("Server listening on port", port)
-	//Distribute all the connections to goroutines
+
 	go func() {
 		err := server.ListenAndServeTLS("auth_service/certificates/self-ssl.crt", "auth_service/certificates/self-ssl.key")
 		if err != nil {

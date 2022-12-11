@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"auth-service/model"
 	"context"
 	"errors"
 	"fmt"
@@ -12,15 +11,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"log"
 	"os"
+	"profile_service/model"
 	"time"
 )
 
-type AuthRepo struct {
+type ProfileRepo struct {
 	cli    *mongo.Client
 	logger *log.Logger
 }
 
-func New(ctx context.Context, logger *log.Logger) (*AuthRepo, error) {
+func New(ctx context.Context, logger *log.Logger) (*ProfileRepo, error) {
 	dburi := os.Getenv("MONGO_DB_URI")
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(dburi))
@@ -33,14 +33,14 @@ func New(ctx context.Context, logger *log.Logger) (*AuthRepo, error) {
 		return nil, err
 	}
 
-	return &AuthRepo{
+	return &ProfileRepo{
 		cli:    client,
 		logger: logger,
 	}, nil
 }
 
 // Disconnect from database
-func (pr *AuthRepo) Disconnect(ctx context.Context) error {
+func (pr *ProfileRepo) Disconnect(ctx context.Context) error {
 	err := pr.cli.Disconnect(ctx)
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func (pr *AuthRepo) Disconnect(ctx context.Context) error {
 }
 
 // Check database connection
-func (pr *AuthRepo) Ping() {
+func (pr *ProfileRepo) Ping() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -67,7 +67,7 @@ func (pr *AuthRepo) Ping() {
 	fmt.Println(databases)
 }
 
-func (pr *AuthRepo) Insert(user *model.RegularProfile) error {
+func (pr *ProfileRepo) Insert(user *model.RegularProfile) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	log.Println("-----------Ulazak u bazu")
@@ -92,7 +92,7 @@ func (pr *AuthRepo) Insert(user *model.RegularProfile) error {
 	return nil
 }
 
-func (pr *AuthRepo) InsertBusiness(user *model.BusinessProfile) error {
+func (pr *ProfileRepo) InsertBusiness(user *model.BusinessProfile) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	log.Println("-----------Ulazak u bazu")
@@ -117,7 +117,7 @@ func (pr *AuthRepo) InsertBusiness(user *model.BusinessProfile) error {
 	return nil
 }
 
-func (pr *AuthRepo) GetByUsername(username string) (*model.RegularProfile, error) {
+func (pr *ProfileRepo) GetByUsername(username string) (*model.RegularProfile, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -133,7 +133,7 @@ func (pr *AuthRepo) GetByUsername(username string) (*model.RegularProfile, error
 	return &user, nil
 }
 
-func (pr *AuthRepo) GetByVerificationCode(code string) (*model.RegularProfile, error) {
+func (pr *ProfileRepo) GetByVerificationCode(code string) (*model.RegularProfile, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -149,7 +149,7 @@ func (pr *AuthRepo) GetByVerificationCode(code string) (*model.RegularProfile, e
 	return &user, nil
 }
 
-func (pr *AuthRepo) GetAll() (model.RegularProfiles, error) {
+func (pr *ProfileRepo) GetAll() (model.RegularProfiles, error) {
 	// Initialise context (after 5 seconds timeout, abort operation)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -169,7 +169,7 @@ func (pr *AuthRepo) GetAll() (model.RegularProfiles, error) {
 	return users, nil
 }
 
-func (pr *AuthRepo) Update(id primitive.ObjectID, user *model.RegularProfile) error {
+func (pr *ProfileRepo) Update(id primitive.ObjectID, user *model.RegularProfile) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	usersCollection := pr.getCollection()
@@ -191,12 +191,12 @@ func (pr *AuthRepo) Update(id primitive.ObjectID, user *model.RegularProfile) er
 	return nil
 }
 
-func (pr *AuthRepo) getCollection() *mongo.Collection {
+func (pr *ProfileRepo) getCollection() *mongo.Collection {
 	userDatabase := pr.cli.Database("twitter")
 	userCollection := userDatabase.Collection("users")
 	return userCollection
 }
 
-func (pr *AuthRepo) DeleteAll() {
+func (pr *ProfileRepo) DeleteAll() {
 	pr.getCollection().DeleteMany(context.TODO(), bson.D{{}})
 }

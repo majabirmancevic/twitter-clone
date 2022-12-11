@@ -1,16 +1,16 @@
 FROM golang:latest as builder
 WORKDIR /app
 
-COPY ./auth_service/go.mod .
-COPY ./auth_service/go.sum .
+COPY ./profile_service/go.mod .
+COPY ./profile_service/go.sum .
 RUN go mod download
-COPY ./auth_service/ .
+COPY ./profile_service/ .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
 FROM alpine
 WORKDIR /root/
 COPY --from=builder /app/main .
 COPY  ./auth_service/certificates ./auth_service/certificates
-COPY ./auth_service/security/password_blacklist.txt ./auth_service/security/password_blacklist.txt
-EXPOSE 8001
+COPY ./profile_service/security/password_blacklist.txt ./profile_service/security/password_blacklist.txt
+EXPOSE 8002
 CMD ["./main"]

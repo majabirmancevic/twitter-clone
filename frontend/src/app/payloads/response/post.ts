@@ -1,4 +1,4 @@
-import { User } from "src/app/user-model";
+import { RegularUser } from "src/app/user-model";
 
 export interface PostResponse{
     id: number,
@@ -10,6 +10,6 @@ export interface PostResponse{
     replyCounter: number,
     retweetCounter: number,
     likeCounter: number,
-    retweetedBy?: User,
+    retweetedBy?: RegularUser,
     quote?: PostResponse
 }

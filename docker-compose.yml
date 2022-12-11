@@ -26,19 +26,37 @@ services:
       - "8001:8001"
     #Will be accessible through os.Getenv("PORT")
     environment:
-        PORT: 8001
+      AUTH_PORT: 8001
       # NoSQL: environment variable holding connection URI for Mongo database
       # protocol://username:password@hostname:port
       #- MONGO_DB_URI=mongodb://root:pass@mongo:27017
-        MONGO_DB_URI: mongodb://mongo:27017
-        JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-#        EMAIL_FROM: ${EMAIL_FROM}
-#        SMTP_HOST: ${SMTP_HOST}
-#        SMTP_USER: ${SMTP_USER}
-#        SMTP_PASS: ${SMTP_PASS}
-#        SMTP_PORT: 587
+      MONGO_DB_URI: mongodb://mongo:27017
+      JWT_SECRET_KEY: c5VjcmV0
+
     depends_on:
       - mongo
+
+  profile_service:
+    build:
+      context: .
+      dockerfile: ./profile_service/Dockerfile
+    restart: always
+    container_name: "profile_service"
+    hostname: "profile_service"
+    ports:
+      - "8002:8002"
+    #Will be accessible through os.Getenv("PORT")
+    environment:
+      PROFILE_PORT: 8002
+      # NoSQL: environment variable holding connection URI for Mongo database
+      # protocol://username:password@hostname:port
+      #- MONGO_DB_URI=mongodb://root:pass@mongo:27017
+      MONGO_DB_URI: mongodb://mongo:27017
+    # JWT_SECRET_KEY: c5VjcmV0
+
+    depends_on:
+      - mongo
+
 
   mongo:
     image: mongo:4.4.6
