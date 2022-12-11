@@ -8,9 +8,9 @@ import { PostResponse } from 'src/app/payloads/response/post';
 })
 export class BusinessProfilePageComponent implements OnInit {
 
-  user: RegularUser;
-  tweets: Array<PostResponse>;
-  currentUsername! : string;
+  // user: RegularUser;
+  // tweets: Array<PostResponse>;
+  // currentUsername! : string;
   
   constructor() { }
 

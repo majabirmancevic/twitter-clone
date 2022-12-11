@@ -5,6 +5,7 @@ import { LocalStorageService } from 'ngx-webstorage';
 import { map, tap, Observable } from 'rxjs';
 import { SignInRequestPayload } from '../payloads/request/sign-in';
 import { SignUpPayload } from '../payloads/request/sign-up';
+import { SignUpPayloadBusiness } from '../payloads/request/sign-up-business';
 import { SignInResponsePayload } from '../payloads/response/sign-in';
 
 @Injectable({
@@ -28,6 +29,19 @@ export class AuthService {
     return this.http.post("https://localhost:8002/", JSON.stringify(payload), { headers: headers });
   }
   
+  
+  signUpBusiness(payload: SignUpPayloadBusiness) {
+
+    const headers = new HttpHeaders({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+
+    }); 
+    const options = { headers: headers };
+       
+    return this.http.post("https://localhost:8002/business", JSON.stringify(payload), { headers: headers });
+  }
+
   signIn(payload: SignInRequestPayload) {
 
     const headers = new HttpHeaders({
