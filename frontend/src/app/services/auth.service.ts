@@ -90,6 +90,14 @@ export class AuthService {
     return localStorage.getItem("username");
   }
 
+  getUser(username: string){
+    return this.http.get(`https://localhost:8002/user/${username}`);
+  }
+
+  // getRole(){
+
+  // }
+
   // getUsernameByToken(){
   //   return JSON.parse(this.localStorage.retrieve("token")).username
   // }

@@ -7,6 +7,7 @@ import { PostService } from 'src/app/services/post.service';
 import { UserService } from 'src/app/services/user.service';
 import { RegularUser } from 'src/app/user-model';
 import { ImageCroppedEvent, base64ToFile } from 'ngx-image-cropper';
+import { BusinessUser } from 'src/app/user-model-business';
 
 @Component({
   selector: 'app-profile-page',
@@ -44,6 +45,7 @@ export class ProfilePageComponent extends OverlayForm implements OnInit {
     this.userService.getRegularUser(this.activateRoute.snapshot.params['username']).subscribe(user => {
       this.user = user;
     });
+
   }
 
     ngOnInit(): void {
