@@ -12,6 +12,7 @@ import { EmailInfoComponent } from './pages/landing-page/email-info/email-info.c
 import { SignUpBusinessComponent } from './pages/landing-page/sign-up-business/sign-up-business.component';
 import {ReactiveFormsModule} from '@angular/forms';
 import {FormsModule} from '@angular/forms';
+import { BusinessProfilePageComponent } from './pages/business-profile-page/business-profile-page.component';
 
 
 const routes: Routes = [
@@ -25,6 +26,7 @@ const routes: Routes = [
   {path : "home" , component: HomePageComponent, canActivate: [AuthGuard]},
   {path : "tweet/:id" , component: TweetPageComponent, canActivate: [AuthGuard]},
   {path : "profile/:username" , component: ProfilePageComponent, canActivate: [AuthGuard]},
+  {path : "profile-business/:username" , component:BusinessProfilePageComponent, canActivate: [AuthGuard]},
   {path : "profile/likes" , component: ProfilePageComponent, canActivate: [AuthGuard]},
   {path : "profile/update" , component: ProfilePageComponent, canActivate: [AuthGuard]},
 

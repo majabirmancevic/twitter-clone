@@ -11,9 +11,13 @@ export class NavbarComponent implements OnInit {
 
   constructor(private router: Router, private authService: AuthService) { }
   username!: string | null;
-
+  user:any;
   ngOnInit(): void {
-    this.username = this.authService.getUsername()
+    this.username = this.authService.getUsername();
+    this.authService.getUser(localStorage.getItem("username")!).subscribe(data => {
+      this.user = data
+    })
+
   }
 
   getUrl(){
@@ -21,7 +25,11 @@ export class NavbarComponent implements OnInit {
   }
 
   navigate(){
-    this.router.navigate(['/profile/',this.username]);
+    if (this.user.role == "regular" ){
+      this.router.navigate(['/profile/',this.username]);
+    }else {
+      this.router.navigate(['/profile-business/',this.username]);
+    }
   }
   // logout(){
   //   this.authService.logout();

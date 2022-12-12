@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { RegularUser } from '../user-model';
+import { BusinessUser } from '../user-model-business';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -20,6 +21,10 @@ export class UserService {
 
   getRegularUser(username: string): Observable<RegularUser>{
     return this.http.get<RegularUser>(`https://localhost:8002/user/${username}`);
+  }
+
+  getBusinessUser(username: string): Observable<BusinessUser>{
+    return this.http.get<BusinessUser>(`https://localhost:8002//business/user/${username}`);
   }
 
  
