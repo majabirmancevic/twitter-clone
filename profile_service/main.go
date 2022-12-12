@@ -53,6 +53,10 @@ func main() {
 	postBusinessRouter.HandleFunc("/business", userHandler.SignUpBusiness)
 	postBusinessRouter.Use(userHandler.MiddlewareBusinessUserDeserialization)
 
+	changePasswordRouter := router.Methods(http.MethodPost).Subrouter()
+	changePasswordRouter.HandleFunc("/changePassword/{username}", userHandler.PasswordChange)
+	changePasswordRouter.Use(userHandler.MiddlewarePasswordDeserialization)
+
 	verifyRouter := router.Methods(http.MethodGet).Subrouter()
 	verifyRouter.HandleFunc("/verifyEmail/{code}", userHandler.VerifyEmail)
 

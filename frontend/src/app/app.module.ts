@@ -28,6 +28,8 @@ import { EmailConfirmComponent } from './pages/landing-page/email-confirm/email-
 import { RecaptchaModule} from 'ng-recaptcha';
 import { EmailInfoComponent } from './pages/landing-page/email-info/email-info.component';
 import { BusinessProfilePageComponent } from './pages/business-profile-page/business-profile-page.component';
+import { ChangePasswordComponent } from './pages/change-password/change-password.component';
+
 
 
 @NgModule({
@@ -47,7 +49,8 @@ import { BusinessProfilePageComponent } from './pages/business-profile-page/busi
 
     BusinessProfilePageComponent,
 
-    SignUpBusinessComponent
+    SignUpBusinessComponent,
+      ChangePasswordComponent
 
   ],
 

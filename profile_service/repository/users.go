@@ -249,6 +249,28 @@ func (pr *ProfileRepo) Update(id primitive.ObjectID, user *model.RegularProfile)
 	return nil
 }
 
+func (pr *ProfileRepo) UpdatePassword(user *model.RegularProfile) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	usersCollection := pr.getCollection()
+
+	//objID, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.M{"username": user.Username}
+
+	update := bson.M{"$set": bson.M{
+		"password": user.Password,
+	}}
+	result, err := usersCollection.UpdateOne(ctx, filter, update)
+	pr.logger.Printf("Documents matched: %v\n", result.MatchedCount)
+	pr.logger.Printf("Documents updated: %v\n", result.ModifiedCount)
+
+	if err != nil {
+		pr.logger.Println(err)
+		return err
+	}
+	return nil
+}
+
 func (pr *ProfileRepo) UpdateBusiness(id primitive.ObjectID, user *model.BusinessProfile) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

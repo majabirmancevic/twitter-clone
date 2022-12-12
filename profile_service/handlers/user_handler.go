@@ -16,6 +16,7 @@ import (
 
 type KeyUser struct{}
 type BusinessUser struct{}
+type Password struct{}
 
 type ProfileHandler struct {
 	logger *log.Logger
@@ -244,6 +245,33 @@ func (p *ProfileHandler) VerifyBusinessEmail(rw http.ResponseWriter, h *http.Req
 
 //-------------------------------------------------------------------------------------------
 
+func (p *ProfileHandler) PasswordChange(rw http.ResponseWriter, h *http.Request) {
+	vars := mux.Vars(h)
+	username := vars["username"]
+
+	user, err := p.repo.GetByUsername(username)
+	if err != nil {
+		http.Error(rw, "user does not exist", http.StatusBadRequest)
+	}
+
+	passwordDto := h.Context().Value(Password{}).(*model.PasswordDto)
+	error := security.VerifyPassword(user.Password, passwordDto.OldPassword)
+	if error != nil {
+		http.Error(rw, "old password and new password don't match", http.StatusBadRequest)
+	}
+
+	newPassword, er := security.EncryptPassword(passwordDto.NewPassword)
+	if er != nil {
+		http.Error(rw, "cant encrypt password", http.StatusBadRequest)
+	}
+
+	user.Password = newPassword
+	p.repo.UpdatePassword(user)
+	rw.WriteHeader(http.StatusOK)
+}
+
+//-------------------------------------------------------------------------------------------
+
 func (p *ProfileHandler) GetRegularUser(rw http.ResponseWriter, h *http.Request) {
 	vars := mux.Vars(h)
 	username := vars["username"]
@@ -349,6 +377,23 @@ func (p *ProfileHandler) MiddlewareBusinessUserDeserialization(next http.Handler
 		}
 
 		ctx := context.WithValue(h.Context(), BusinessUser{}, user)
+		h = h.WithContext(ctx)
+
+		next.ServeHTTP(rw, h)
+	})
+}
+
+func (p *ProfileHandler) MiddlewarePasswordDeserialization(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, h *http.Request) {
+		passwordDTo := &model.PasswordDto{}
+		err := passwordDTo.FromJSON(h.Body)
+		if err != nil {
+			http.Error(rw, "Unable to decode json", http.StatusBadRequest)
+			p.logger.Fatal(err)
+			return
+		}
+
+		ctx := context.WithValue(h.Context(), Password{}, passwordDTo)
 		h = h.WithContext(ctx)
 
 		next.ServeHTTP(rw, h)

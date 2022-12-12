@@ -62,6 +62,24 @@ type SignInResponseRegular struct {
 	RegularProfile DBRegularResponse `bson:"user" json:"user" `
 }
 
+// -------------------------------------------------------------------------------------------------
+func (p *PasswordDto) FromJSON(r io.Reader) error {
+	d := json.NewDecoder(r)
+	return d.Decode(p)
+}
+
+func (p *PasswordDto) ToJSON(w io.Writer) error {
+	e := json.NewEncoder(w)
+	return e.Encode(p)
+}
+
+//--------------------------------------------------------------------------------------------------
+
+type PasswordDto struct {
+	OldPassword string `bson:"oldPassword" json:"oldPassword"`
+	NewPassword string `bson:"newPassword" json:"newPassword"`
+}
+
 func NewUserResponse(user *RegularProfile) DBRegularResponse {
 	return DBRegularResponse{
 		ID:            user.ID,

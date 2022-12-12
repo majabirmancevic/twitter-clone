@@ -55,6 +55,9 @@ export class ProfilePageComponent extends OverlayForm implements OnInit {
     return this.router.url;
   }
 
+  goToChangePass(){
+    this.router.navigate(['/change-password/',this.activateRoute.snapshot.params['username']]);
+  }
 
   fetchTweets() {
     this.postService.getTweetsByUsername(this.user.username).subscribe(response => this.tweets = response);

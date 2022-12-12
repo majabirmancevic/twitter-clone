@@ -12,6 +12,7 @@ import { EmailInfoComponent } from './pages/landing-page/email-info/email-info.c
 import { SignUpBusinessComponent } from './pages/landing-page/sign-up-business/sign-up-business.component';
 import {ReactiveFormsModule} from '@angular/forms';
 import {FormsModule} from '@angular/forms';
+import { ChangePasswordComponent } from './pages/change-password/change-password.component';
 
 
 const routes: Routes = [
@@ -27,6 +28,7 @@ const routes: Routes = [
   {path : "profile/:username" , component: ProfilePageComponent, canActivate: [AuthGuard]},
   {path : "profile/likes" , component: ProfilePageComponent, canActivate: [AuthGuard]},
   {path : "profile/update" , component: ProfilePageComponent, canActivate: [AuthGuard]},
+  {path : "change-password/:username", component : ChangePasswordComponent, canActivate: [AuthGuard]}
 
 ];
 

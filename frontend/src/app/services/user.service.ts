@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { PasswordDto } from '../pages/change-password/password-dto';
 import { RegularUser } from '../user-model';
 import { AuthService } from './auth.service';
 
@@ -22,7 +23,9 @@ export class UserService {
     return this.http.get<RegularUser>(`https://localhost:8002/user/${username}`);
   }
 
- 
+  changePassword(username: string, payload: PasswordDto){
+    return this.http.post(`https://localhost:8000/profile_service/changePassword/${username}`, JSON.stringify(payload))
+  }
 
 
   // editProfile(payload: any){

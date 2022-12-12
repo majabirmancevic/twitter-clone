@@ -59,6 +59,7 @@
                         </div>
                     </div>
                 </div>
+                <button (click)="goToChangePass()">Change password</button>
                 <div>
                     <div *ngFor="let tweet of tweets" class="tweets">
                         <app-tweet [tweet]="tweet"></app-tweet>
