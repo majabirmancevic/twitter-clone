@@ -1,9 +1,9 @@
 package config
 
 import (
-	"auth-service/config/config"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
+	"profile_service/config/config"
 )
 
 type Server struct {

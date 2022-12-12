@@ -47,29 +47,29 @@ func main() {
 	router := mux.NewRouter()
 	router.Use(userHandler.MiddlewareContentTypeSet)
 
-	getRouter := router.Methods(http.MethodGet).Subrouter()
-	getRouter.HandleFunc("/", userHandler.GetAllRegularUsers)
+	//getRouter := router.Methods(http.MethodGet).Subrouter()
+	//getRouter.HandleFunc("/", userHandler.GetAllRegularUsers)
+	//
+	//deleteRouter := router.Methods(http.MethodDelete).Subrouter()
+	//deleteRouter.HandleFunc("/", userHandler.DeleteAll)
 
-	deleteRouter := router.Methods(http.MethodDelete).Subrouter()
-	deleteRouter.HandleFunc("/", userHandler.DeleteAll)
-
-	postRouter := router.Methods(http.MethodPost).Subrouter()
-	postRouter.HandleFunc("/", userHandler.SignUp)
-	postRouter.Use(userHandler.MiddlewareUserDeserialization)
-
-	postBusinessRouter := router.Methods(http.MethodPost).Subrouter()
-	postBusinessRouter.HandleFunc("/business", userHandler.SignUpBusiness)
-	postBusinessRouter.Use(userHandler.MiddlewareBusinessUserDeserialization)
+	//postRouter := router.Methods(http.MethodPost).Subrouter()
+	//postRouter.HandleFunc("/", userHandler.SignUp)
+	//postRouter.Use(userHandler.MiddlewareUserDeserialization)
+	//
+	//postBusinessRouter := router.Methods(http.MethodPost).Subrouter()
+	//postBusinessRouter.HandleFunc("/business", userHandler.SignUpBusiness)
+	//postBusinessRouter.Use(userHandler.MiddlewareBusinessUserDeserialization)
 
 	loginRouter := router.Methods(http.MethodPost).Subrouter()
 	loginRouter.HandleFunc("/login", userHandler.SignIn)
 	loginRouter.Use(userHandler.MiddlewareLoginDeserialization)
 
-	verifyRouter := router.Methods(http.MethodGet).Subrouter()
-	verifyRouter.HandleFunc("/verifyEmail/{code}", userHandler.VerifyEmail)
-
-	emailRouter := router.Methods(http.MethodGet).Subrouter()
-	emailRouter.HandleFunc("/sendMail", userHandler.SendingMailTest)
+	//verifyRouter := router.Methods(http.MethodGet).Subrouter()
+	//verifyRouter.HandleFunc("/verifyEmail/{code}", userHandler.VerifyEmail)
+	//
+	//emailRouter := router.Methods(http.MethodGet).Subrouter()
+	//emailRouter.HandleFunc("/sendMail", userHandler.SendingMailTest)
 
 	// ZA PROVERU PRISTUPA RUTA NA OSNOVU TOKENA
 	//middlewares.Authenticate(userHandler.SignIn)

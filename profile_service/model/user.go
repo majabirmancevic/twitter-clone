@@ -19,6 +19,7 @@ import (
 //}
 
 type RegularProfiles []*RegularProfile
+type BusinessProfiles []*BusinessProfile
 
 // Model for create and read user from db
 type RegularProfile struct {
@@ -79,12 +80,12 @@ func NewUserResponse(user *RegularProfile) DBRegularResponse {
 
 // -------------------------------------------------------------------------------------------------------------
 type BusinessProfile struct {
-	ID               primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CompanyName      string             `bson:"companyName,omitempty" json:"companyName"`
-	Email            string             `bson:"email,omitempty" json:"email"`
-	WebSite          string             `bson:"webSite,omitempty" json:"webSite"`
-	Username         string             `bson:"username,omitempty" json:"username"`
-	Password         string             `bson:"password,omitempty" json:"password"`
+	ID               primitive.ObjectID `bson:"_id" json:"id"`
+	CompanyName      string             `bson:"companyName" json:"companyName" validate:"required,min=2,max=30"`
+	Email            string             `bson:"email" json:"email" validate:"email,required"`
+	WebSite          string             `bson:"webSite" json:"webSite" validate:"required"`
+	Username         string             `bson:"username" json:"username" validate:"required"`
+	Password         string             `bson:"password" json:"password" validate:"required,min=8"`
 	VerificationCode string             `bson:"verificationCode" json:"verificationCode" `
 	Verified         bool               `bson:"verified" json:"verified" `
 	Role             string             `json:"role" bson:"role"`
@@ -96,6 +97,10 @@ func (p *BusinessProfile) FromJSON(r io.Reader) error {
 }
 
 func (p *BusinessProfile) ToJSON(w io.Writer) error {
+	e := json.NewEncoder(w)
+	return e.Encode(p)
+}
+func (p *BusinessProfiles) ToJSON(w io.Writer) error {
 	e := json.NewEncoder(w)
 	return e.Encode(p)
 }

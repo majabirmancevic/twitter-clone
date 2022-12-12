@@ -27,8 +27,7 @@
             
             <label>Username</label>
             <div>
-                <span *ngIf="username.errors?.['required'] && form.get('username')?.touched" style="color:red ;">Please enter a username</span>
-                <span *ngIf="username.errors?.['usernameExists']" style="color:red ;">This username has been taken</span>
+                
                 <input  [formControlName]="'username'" type="text">
             </div> 
              

@@ -27,8 +27,8 @@ func main() {
 	defer cancel()
 
 	//Initialize the logger we are going to use, with prefix and datetime for every log
-	logger := log.New(os.Stdout, "[auth-api] ", log.LstdFlags)
-	storeLogger := log.New(os.Stdout, "[auth-store] ", log.LstdFlags)
+	logger := log.New(os.Stdout, "[profile-api] ", log.LstdFlags)
+	storeLogger := log.New(os.Stdout, "[profile-store] ", log.LstdFlags)
 
 	// NoSQL: Initialize Product Repository store
 	store, err := repository.New(timeoutContext, storeLogger)
@@ -43,7 +43,7 @@ func main() {
 	userHandler := handlers.NewProfileHandler(logger, store)
 
 	router := mux.NewRouter()
-	//router.Use(userHandler.MiddlewareContentTypeSet)
+	router.Use(userHandler.MiddlewareContentTypeSet)
 
 	postRouter := router.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/", userHandler.SignUp)
@@ -56,8 +56,23 @@ func main() {
 	verifyRouter := router.Methods(http.MethodGet).Subrouter()
 	verifyRouter.HandleFunc("/verifyEmail/{code}", userHandler.VerifyEmail)
 
+	verifyBusinessRouter := router.Methods(http.MethodGet).Subrouter()
+	verifyBusinessRouter.HandleFunc("/business/verifyEmail/{code}", userHandler.VerifyBusinessEmail)
+
 	getUserRouter := router.Methods(http.MethodGet).Subrouter()
 	getUserRouter.HandleFunc("/user/{username}", userHandler.GetRegularUser)
+
+	getBusinessUserRouter := router.Methods(http.MethodGet).Subrouter()
+	getBusinessUserRouter.HandleFunc("/business/user/{username}", userHandler.GetBusinessUser)
+
+	getRouter := router.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/", userHandler.GetAllRegularUsers)
+
+	getBusinessRouter := router.Methods(http.MethodGet).Subrouter()
+	getBusinessRouter.HandleFunc("/business", userHandler.GetAllBusinessUsers)
+
+	deleteRouter := router.Methods(http.MethodDelete).Subrouter()
+	deleteRouter.HandleFunc("/", userHandler.DeleteAll)
 
 	// ZA PROVERU PRISTUPA RUTA NA OSNOVU TOKENA
 	//middlewares.Authenticate(userHandler.SignIn)

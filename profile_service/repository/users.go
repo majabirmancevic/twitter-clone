@@ -67,15 +67,15 @@ func (pr *ProfileRepo) Ping() {
 	fmt.Println(databases)
 }
 
+// ---------------------------------------------------------------------------------------------
 func (pr *ProfileRepo) Insert(user *model.RegularProfile) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	//ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	//defer cancel()
+
 	log.Println("-----------Ulazak u bazu")
 	usersCollection := pr.getCollection()
 
-	log.Println("----------KORISNICI--------")
-	log.Println(usersCollection)
-	result, err := usersCollection.InsertOne(ctx, &user)
+	result, err := usersCollection.InsertOne(context.TODO(), &user)
 	log.Println("----rezultat---- ", result)
 	log.Println("----eror---- ", err)
 
@@ -91,16 +91,19 @@ func (pr *ProfileRepo) Insert(user *model.RegularProfile) error {
 	pr.logger.Println(" --------- Kreiran korisnik sa korisnickim imenom ", user.Username)
 	return nil
 }
-
-func (pr *ProfileRepo) InsertBusiness(user *model.BusinessProfile) error {
+func (pr *ProfileRepo) InsertBusinessUser(user *model.BusinessProfile) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
+	pr.logger.Println("USER ZA UPIS ", user.CompanyName, user.WebSite)
 	log.Println("-----------Ulazak u bazu")
 	usersCollection := pr.getCollection()
 
-	log.Println("----------KORISNICI--------")
-	log.Println(usersCollection)
-	result, err := usersCollection.InsertOne(ctx, &user)
+	doc := bson.D{{"_id", user.ID}, {"companyName", user.CompanyName}, {"email", user.Email}, {"webSite", user.WebSite}, {"username", user.Username},
+		{"password", user.Password}, {"verificationCode", user.VerificationCode}, {"verified", user.Verified}, {"role", user.Role}}
+
+	result, err := usersCollection.InsertOne(ctx, doc)
+	pr.logger.Println(usersCollection)
 	log.Println("----rezultat---- ", result)
 	log.Println("----eror---- ", err)
 
@@ -112,11 +115,11 @@ func (pr *ProfileRepo) InsertBusiness(user *model.BusinessProfile) error {
 		}
 		return err
 	}
-	pr.logger.Printf("Documents ID: %v\n", result.InsertedID)
-	pr.logger.Println(" --------- Kreiran korisnik sa korisnickim imenom ", user.Username)
+
 	return nil
 }
 
+// ---------------------------------------------------------------------------------------------------
 func (pr *ProfileRepo) GetByUsername(username string) (*model.RegularProfile, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -133,6 +136,23 @@ func (pr *ProfileRepo) GetByUsername(username string) (*model.RegularProfile, er
 	return &user, nil
 }
 
+func (pr *ProfileRepo) GetBusinessByUsername(username string) (*model.BusinessProfile, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	usersCollection := pr.getCollection()
+
+	var user model.BusinessProfile
+	err := usersCollection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+	if err != nil {
+		pr.logger.Println(" -------- Ovaj korisnik ne postoji")
+		pr.logger.Println(err)
+		return nil, err
+	}
+	return &user, nil
+}
+
+// ---------------------------------------------------------------------------------------------------
 func (pr *ProfileRepo) GetByVerificationCode(code string) (*model.RegularProfile, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -149,6 +169,23 @@ func (pr *ProfileRepo) GetByVerificationCode(code string) (*model.RegularProfile
 	return &user, nil
 }
 
+func (pr *ProfileRepo) GetBusinessByVerificationCode(code string) (*model.BusinessProfile, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	usersCollection := pr.getCollection()
+
+	var user model.BusinessProfile
+	err := usersCollection.FindOne(ctx, bson.M{"verificationCode": code}).Decode(&user)
+	if err != nil {
+		pr.logger.Println(" -------- Ovaj korisnik ne postoji")
+		pr.logger.Println(err)
+		return nil, err
+	}
+	return &user, nil
+}
+
+// --------------------------------------------------------------------------------------------------
 func (pr *ProfileRepo) GetAll() (model.RegularProfiles, error) {
 	// Initialise context (after 5 seconds timeout, abort operation)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -169,6 +206,27 @@ func (pr *ProfileRepo) GetAll() (model.RegularProfiles, error) {
 	return users, nil
 }
 
+func (pr *ProfileRepo) GetAllBusiness() (model.BusinessProfiles, error) {
+	// Initialise context (after 5 seconds timeout, abort operation)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	usersCollection := pr.getCollection()
+
+	var users model.BusinessProfiles
+	usersCursor, err := usersCollection.Find(ctx, bson.M{})
+	if err != nil {
+		pr.logger.Println(err)
+		return nil, err
+	}
+	if err = usersCursor.All(ctx, &users); err != nil {
+		pr.logger.Println(err)
+		return nil, err
+	}
+	return users, nil
+}
+
+// -------------------------------------------------------------------------------------------------
 func (pr *ProfileRepo) Update(id primitive.ObjectID, user *model.RegularProfile) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -191,6 +249,29 @@ func (pr *ProfileRepo) Update(id primitive.ObjectID, user *model.RegularProfile)
 	return nil
 }
 
+func (pr *ProfileRepo) UpdateBusiness(id primitive.ObjectID, user *model.BusinessProfile) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	usersCollection := pr.getCollection()
+
+	//objID, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.M{"_id": id}
+	update := bson.M{"$set": bson.M{
+		"verificationCode": user.VerificationCode,
+		"verified":         user.Verified,
+	}}
+	result, err := usersCollection.UpdateOne(ctx, filter, update)
+	pr.logger.Printf("Documents matched: %v\n", result.MatchedCount)
+	pr.logger.Printf("Documents updated: %v\n", result.ModifiedCount)
+
+	if err != nil {
+		pr.logger.Println(err)
+		return err
+	}
+	return nil
+}
+
+// -------------------------------------------------------------------------------------------------
 func (pr *ProfileRepo) getCollection() *mongo.Collection {
 	userDatabase := pr.cli.Database("twitter")
 	userCollection := userDatabase.Collection("users")

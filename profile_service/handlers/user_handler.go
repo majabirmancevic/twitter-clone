@@ -15,6 +15,7 @@ import (
 )
 
 type KeyUser struct{}
+type BusinessUser struct{}
 
 type ProfileHandler struct {
 	logger *log.Logger
@@ -40,14 +41,6 @@ func (p *ProfileHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 
 		http.Error(rw, "your data input isn't valid", http.StatusInternalServerError)
 		return
-	}
-
-	p.logger.Println("PROVERA U BLEK LISTI ", security.CheckBlacklistedPassword(user.Password))
-	passwords, err := security.LoadPasswords()
-	log.Print(len(passwords))
-	//p.logger.Println("PRVIH 5 IZ BLEK LISTE ", passwords[0], passwords[1], passwords[2], passwords[3], passwords[4], passwords[5])
-	if err != nil {
-		http.Error(rw, "Can't read file", http.StatusInternalServerError)
 	}
 
 	if security.CheckBlacklistedPassword(user.Password) {
@@ -91,9 +84,6 @@ func (p *ProfileHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 		firstName = strings.Split(firstName, " ")[1]
 	}
 
-	//p.logger.Println("------- slanje mejla ")
-	//security.SendMailSMTP(code, firstName)
-
 	// 👇 Send Email
 	emailData := security.EmailData{
 		URL:       "Your account verification code is " + code,
@@ -116,21 +106,14 @@ func (p *ProfileHandler) SignUp(rw http.ResponseWriter, h *http.Request) {
 
 func (p *ProfileHandler) SignUpBusiness(rw http.ResponseWriter, h *http.Request) {
 
-	user := h.Context().Value(KeyUser{}).(*model.BusinessProfile)
+	user := h.Context().Value(BusinessUser{}).(*model.BusinessProfile)
+	p.logger.Println("BIZNIS USER ", user.CompanyName, user.WebSite, user.Email)
 	user.Email = strings.ToLower(user.Email)
 
 	if security.VerifyBusinessInputs(user.CompanyName, user.Email, user.WebSite, user.Username, user.Password) == false {
 
 		security.WriteAsJson(rw, http.StatusBadRequest, errors.New("your data input isn't valid"))
 		return
-	}
-
-	p.logger.Println("PROVERA U BLEK LISTI ", security.CheckBlacklistedPassword(user.Password))
-	passwords, err := security.LoadPasswords()
-	log.Print(len(passwords))
-	//p.logger.Println("PRVIH 5 IZ BLEK LISTE ", passwords[0], passwords[1], passwords[2], passwords[3], passwords[4], passwords[5])
-	if err != nil {
-		http.Error(rw, "Can't read file", http.StatusInternalServerError)
 	}
 
 	if security.CheckBlacklistedPassword(user.Password) {
@@ -145,9 +128,9 @@ func (p *ProfileHandler) SignUpBusiness(rw http.ResponseWriter, h *http.Request)
 	user.Role = "business"
 	user.Verified = false
 
-	found, _ := p.repo.GetByUsername(user.Username)
-
-	if found != nil && found.Username == user.Username {
+	foundRegular, _ := p.repo.GetByUsername(user.Username)
+	foundBusiness, _ := p.repo.GetBusinessByUsername(user.Username)
+	if (foundRegular != nil && foundRegular.Username == user.Username) || (foundBusiness != nil && foundBusiness.Username == user.Username) {
 		p.logger.Fatal("This username is already used !")
 		security.WriteAsJson(rw, http.StatusBadRequest, "User already exist with this username !")
 		return
@@ -160,7 +143,7 @@ func (p *ProfileHandler) SignUpBusiness(rw http.ResponseWriter, h *http.Request)
 	user.VerificationCode = verificationCode
 
 	p.logger.Println("------- SLANJE U BAZU")
-	error := p.repo.InsertBusiness(user)
+	error := p.repo.InsertBusinessUser(user)
 	if error != nil {
 		p.logger.Println(" ----- Error ", error)
 		security.WriteAsJson(rw, http.StatusBadRequest, "Neuspesno dodavanje korisnika !")
@@ -186,6 +169,7 @@ func (p *ProfileHandler) SignUpBusiness(rw http.ResponseWriter, h *http.Request)
 	rw.WriteHeader(http.StatusCreated)
 }
 
+// -------------------------------------------------------------------------------------------------
 func (p *ProfileHandler) VerifyEmail(rw http.ResponseWriter, h *http.Request) {
 	vars := mux.Vars(h)
 	code := vars["code"]
@@ -222,6 +206,44 @@ func (p *ProfileHandler) VerifyEmail(rw http.ResponseWriter, h *http.Request) {
 
 }
 
+func (p *ProfileHandler) VerifyBusinessEmail(rw http.ResponseWriter, h *http.Request) {
+	vars := mux.Vars(h)
+	code := vars["code"]
+	verificationCode := security.Encode(code)
+
+	log.Println("CODE ", code)
+	log.Println("Verification code ", verificationCode)
+	//var updatedUser model.RegularProfile
+	updatedUser, err := p.repo.GetBusinessByVerificationCode(verificationCode)
+
+	log.Println("UPDATED USER ", updatedUser)
+
+	if err != nil {
+		log.Println("Invalid verification code or user doesn't exists")
+		log.Println(err.Error())
+		response := errors.New("Invalid verification code or user doesn't exists")
+		security.WriteAsJson(rw, http.StatusBadRequest, response)
+		return
+	}
+
+	if updatedUser.Verified {
+		log.Println("User already verified")
+		log.Println(err.Error())
+		response := errors.New("User already verified")
+		security.WriteAsJson(rw, http.StatusConflict, response)
+		return
+	}
+
+	updatedUser.VerificationCode = ""
+	updatedUser.Verified = true
+	p.repo.UpdateBusiness(updatedUser.ID, updatedUser)
+
+	rw.WriteHeader(http.StatusOK)
+
+}
+
+//-------------------------------------------------------------------------------------------
+
 func (p *ProfileHandler) GetRegularUser(rw http.ResponseWriter, h *http.Request) {
 	vars := mux.Vars(h)
 	username := vars["username"]
@@ -237,6 +259,68 @@ func (p *ProfileHandler) GetRegularUser(rw http.ResponseWriter, h *http.Request)
 
 }
 
+func (p *ProfileHandler) GetBusinessUser(rw http.ResponseWriter, h *http.Request) {
+	vars := mux.Vars(h)
+	username := vars["username"]
+
+	user, err := p.repo.GetBusinessByUsername(username)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//response := model.NewUserResponse(user)
+	security.WriteAsJson(rw, http.StatusOK, user)
+
+}
+
+//------------------------------------------------------------------------------------------
+
+func (p *ProfileHandler) GetAllRegularUsers(rw http.ResponseWriter, h *http.Request) {
+	users, err := p.repo.GetAll()
+	if err != nil {
+		p.logger.Print("Database exception: ", err)
+	}
+
+	if users == nil {
+		return
+	}
+
+	err = users.ToJSON(rw)
+	if err != nil {
+		http.Error(rw, "Unable to convert to json", http.StatusInternalServerError)
+		p.logger.Fatal("Unable to convert to json :", err)
+		return
+	}
+}
+
+func (p *ProfileHandler) GetAllBusinessUsers(rw http.ResponseWriter, h *http.Request) {
+	users, err := p.repo.GetAllBusiness()
+	if err != nil {
+		p.logger.Print("Database exception: ", err)
+	}
+
+	if users == nil {
+		return
+	}
+
+	err = users.ToJSON(rw)
+	if err != nil {
+		http.Error(rw, "Unable to convert to json", http.StatusInternalServerError)
+		p.logger.Fatal("Unable to convert to json :", err)
+		return
+	}
+}
+
+//-----------------------------------------------------------------------------------------------
+
+func (p *ProfileHandler) DeleteAll(rw http.ResponseWriter, h *http.Request) {
+
+	p.repo.DeleteAll()
+	rw.WriteHeader(http.StatusNoContent)
+}
+
+// ------------------------------------------------------------------------------------------
 func (p *ProfileHandler) MiddlewareUserDeserialization(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, h *http.Request) {
 		user := &model.RegularProfile{}
@@ -264,7 +348,7 @@ func (p *ProfileHandler) MiddlewareBusinessUserDeserialization(next http.Handler
 			return
 		}
 
-		ctx := context.WithValue(h.Context(), KeyUser{}, user)
+		ctx := context.WithValue(h.Context(), BusinessUser{}, user)
 		h = h.WithContext(ctx)
 
 		next.ServeHTTP(rw, h)

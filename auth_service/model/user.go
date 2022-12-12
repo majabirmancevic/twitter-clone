@@ -22,34 +22,34 @@ type RegularProfiles []*RegularProfile
 
 // Model for create and read user from db
 type RegularProfile struct {
-	ID               primitive.ObjectID `bson:"_id" json:"id"`
-	Name             string             `bson:"name" json:"name" validate:"required,min=2,max=30"`
-	Lastname         string             `bson:"lastname" json:"lastname" validate:"required,min=2,max=30"`
-	Gender           string             `bson:"gender" json:"gender" validate:"required"`
-	Age              int32              `bson:"age" json:"age" validate:"required,min=13"`
-	PlaceOfLiving    string             `bson:"placeOfLiving" json:"placeOfLiving" validate:"required"`
-	Email            string             `json:"email" bson:"email" validate:"email,required"`
-	Username         string             `bson:"username" json:"username" validate:"required"`
-	Password         string             `bson:"password" json:"password" validate:"required,min=8"`
-	VerificationCode string             `bson:"verificationCode" json:"verificationCode" `
-	Verified         bool               `bson:"verified" json:"verified" `
-	Role             string             `json:"role" bson:"role"`
+	ID primitive.ObjectID `bson:"_id" json:"id"`
+	//Name             string             `bson:"name" json:"name" validate:"required,min=2,max=30"`
+	//Lastname         string             `bson:"lastname" json:"lastname" validate:"required,min=2,max=30"`
+	//Gender           string             `bson:"gender" json:"gender" validate:"required"`
+	//Age              int32              `bson:"age" json:"age" validate:"required,min=13"`
+	//PlaceOfLiving    string             `bson:"placeOfLiving" json:"placeOfLiving" validate:"required"`
+	//Email            string             `json:"email" bson:"email" validate:"email,required"`
+	Username string `bson:"username" json:"username" validate:"required"`
+	Password string `bson:"password" json:"password" validate:"required,min=8"`
+	//VerificationCode string             `bson:"verificationCode" json:"verificationCode" `
+	Verified bool   `bson:"verified" json:"verified" `
+	Role     string `json:"role" bson:"role"`
 }
 
-// Response for client without password
-type DBRegularResponse struct {
-	ID               primitive.ObjectID `bson:"_id" json:"id"`
-	Name             string             `bson:"name" json:"name" validate:"required,min=2,max=30"`
-	Lastname         string             `bson:"lastname" json:"lastname" validate:"required,min=2,max=30"`
-	Gender           string             `bson:"gender" json:"gender" validate:"required"`
-	Age              int32              `bson:"age" json:"age" validate:"required,min=13"`
-	PlaceOfLiving    string             `bson:"placeOfLiving" json:"placeOfLiving" validate:"required"`
-	Email            string             `json:"email" bson:"email" validate:"email,required"`
-	Username         string             `bson:"username" json:"username" validate:"required"`
-	VerificationCode string             `bson:"verificationCode" json:"verificationCode" `
-	Verified         bool               `bson:"verified" json:"verified" `
-	Role             string             `json:"role" bson:"role"`
-}
+//// Response for client without password
+//type DBRegularResponse struct {
+//	ID               primitive.ObjectID `bson:"_id" json:"id"`
+//	Name             string             `bson:"name" json:"name" validate:"required,min=2,max=30"`
+//	Lastname         string             `bson:"lastname" json:"lastname" validate:"required,min=2,max=30"`
+//	Gender           string             `bson:"gender" json:"gender" validate:"required"`
+//	Age              int32              `bson:"age" json:"age" validate:"required,min=13"`
+//	PlaceOfLiving    string             `bson:"placeOfLiving" json:"placeOfLiving" validate:"required"`
+//	Email            string             `json:"email" bson:"email" validate:"email,required"`
+//	Username         string             `bson:"username" json:"username" validate:"required"`
+//	VerificationCode string             `bson:"verificationCode" json:"verificationCode" `
+//	Verified         bool               `bson:"verified" json:"verified" `
+//	Role             string             `json:"role" bson:"role"`
+//}
 
 type SignInRequest struct {
 	Username string `bson:"username" json:"username" binding:"required"`
@@ -62,21 +62,21 @@ type SignInResponseRegular struct {
 	//RegularProfile DBRegularResponse `bson:"user" json:"user" `
 }
 
-func NewUserResponse(user *RegularProfile) DBRegularResponse {
-	return DBRegularResponse{
-		ID:               user.ID,
-		Name:             user.Name,
-		Lastname:         user.Lastname,
-		Gender:           user.Gender,
-		Age:              user.Age,
-		PlaceOfLiving:    user.PlaceOfLiving,
-		Email:            user.Email,
-		Username:         user.Username,
-		VerificationCode: user.VerificationCode,
-		Verified:         user.Verified,
-		Role:             user.Role,
-	}
-}
+//func NewUserResponse(user *RegularProfile) DBRegularResponse {
+//	return DBRegularResponse{
+//		ID:               user.ID,
+//		Name:             user.Name,
+//		Lastname:         user.Lastname,
+//		Gender:           user.Gender,
+//		Age:              user.Age,
+//		PlaceOfLiving:    user.PlaceOfLiving,
+//		Email:            user.Email,
+//		Username:         user.Username,
+//		VerificationCode: user.VerificationCode,
+//		Verified:         user.Verified,
+//		Role:             user.Role,
+//	}
+//}
 
 // -------------------------------------------------------------------------------------------------------------
 type BusinessProfile struct {
