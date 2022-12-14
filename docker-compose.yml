@@ -58,6 +58,26 @@ services:
       - mongo
 
 
+  tweet_service:
+    build:
+      context: .
+      dockerfile: ./tweet_service/Dockerfile
+    restart: always
+    container_name: "tweet_service"
+    hostname: "tweet_service"
+    ports:
+      - "8003:8003"
+    #Will be accessible through os.Getenv("PORT")
+    environment:
+      TWEET_PORT: 8003
+      # NoSQL: environment variable holding connection URI for Cassandra database
+      CASS_DB: cassandra:9042
+    # JWT_SECRET_KEY: c5VjcmV0
+
+    depends_on:
+      cassandra:
+        condition: service_healthy
+
   mongo:
     image: mongo:4.4.6
     restart: always
@@ -76,5 +96,22 @@ services:
     volumes:
       - mongo_store:/data/db
 
+
+  # NoSQL: CassandraDB
+  cassandra:
+    image: cassandra:4.0
+    restart: always
+    ports:
+      - "9042:9042"
+    # Docker healtcheck - checks if database is "alive"
+    healthcheck:
+      test: [ "CMD-SHELL", "cqlsh -e 'describe cluster'" ]
+      interval: 15s
+      timeout: 5s
+      retries: 15
+    volumes:
+      - cass_store:/var/lib/cassandra/data
+
 volumes:
   mongo_store:
+  cass_store:
