@@ -60,23 +60,55 @@ func (tr *TweetRepo) CloseSession() {
 func (tr *TweetRepo) CreateTables() {
 	err := tr.session.Query(
 		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s 
-					(regular_username text, description text, id UUID, 
+					(regular_username text, description text, id UUID,like_counter 
 					PRIMARY KEY (regular_username)) `,
 			"tweet_by_regular_user")).Exec()
 	log.Println("KREIRANJE TABELA")
 	if err != nil {
 		tr.logger.Println(err)
 	}
+
+	err = tr.session.Query(
+		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s 
+					(regular_username text, tweet_id UUID, 
+					PRIMARY KEY (tweet_id)) `,
+			"likes_by_regular_user")).Exec()
+	log.Println("KREIRANJE TABELA")
+	if err != nil {
+		tr.logger.Println(err)
+	}
+}
+
+func (tr *TweetRepo) GetTweetByID(id string) (*TweetByRegularUser, error) {
+
+	scanner := tr.session.Query(`SELECT regular_username, description,like_counter, id FROM tweet_by_regular_user WHERE id = ?`,
+		id).Iter().Scanner()
+
+	var tweet *TweetByRegularUser
+	for scanner.Next() {
+		//var tweet TweetByRegularUser
+		err := scanner.Scan(&tweet.RegularUsername, &tweet.Description,&tweet.LikeCounter, &tweet.Id)
+		if err != nil {
+			tr.logger.Println(err)
+			return nil, err
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		tr.logger.Println(err)
+		return nil, err
+	}
+	return tweet, nil
 }
 
 func (tr *TweetRepo) GetTweetsByUser(username string) (TweetsByRegularUser, error) {
-	scanner := tr.session.Query(`SELECT regular_username, description, id FROM tweet_by_regular_user WHERE regular_username = ?`,
+	scanner := tr.session.Query(`SELECT regular_username, description,like_counter, id FROM tweet_by_regular_user WHERE regular_username = ?`,
 		username).Iter().Scanner()
 
 	var tweets TweetsByRegularUser
 	for scanner.Next() {
 		var tweet TweetByRegularUser
-		err := scanner.Scan(&tweet.RegularUsername, &tweet.Description, &tweet.Id)
+		err := scanner.Scan(&tweet.RegularUsername, &tweet.Description,&tweet.LikeCounter, &tweet.Id)
 		if err != nil {
 			tr.logger.Println(err)
 			return nil, err
@@ -93,8 +125,8 @@ func (tr *TweetRepo) GetTweetsByUser(username string) (TweetsByRegularUser, erro
 func (tr *TweetRepo) InsertTweetByRegUser(regUserTweet *TweetByRegularUser) error {
 	tweetId, _ := gocql.RandomUUID()
 	err := tr.session.Query(
-		`INSERT INTO tweet_by_regular_user (regular_username, description, id) 
-		VALUES (?, ?, ?)`,
+		`INSERT INTO tweet_by_regular_user (regular_username, description,like_counter, id) 
+		VALUES (?, ?, ?,?)`,
 		regUserTweet.RegularUsername, regUserTweet.Description, tweetId).Exec()
 	if err != nil {
 		tr.logger.Println(err)
