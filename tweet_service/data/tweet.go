@@ -7,6 +7,7 @@ import (
 )
 
 type TweetByRegularUser struct {
+	LikeCounter     uint64     `json:"like_counter"`
 	RegularUsername string     `json:"regular_username"`
 	Description     string     `json:"description"`
 	Id              gocql.UUID `json:"id"`

@@ -43,6 +43,11 @@ func (s *TweetsHandler) GetAllRegularUserIds(rw http.ResponseWriter, h *http.Req
 	}
 }
 
+func (s *TweetsHandler) LikeTweet(rw http.ResponseWriter, h *http.Request){
+
+
+}
+
 func (s *TweetsHandler) GetTweetsByRegUser(rw http.ResponseWriter, h *http.Request) {
 	vars := mux.Vars(h)
 	username := vars["username"]
