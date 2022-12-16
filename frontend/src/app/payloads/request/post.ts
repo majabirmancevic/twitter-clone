@@ -1,5 +1,4 @@
 export interface PostRequest{
-    text: string,
-    tweetId?: number,
-    type: string
+    description: string,
+    regular_username: string
 }

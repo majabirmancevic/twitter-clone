@@ -4,23 +4,22 @@
     Retweeted
 </div> -->
 <div class="tweet-header">
-    <img [src]="'http://localhost:8080/user/profile-picture/get/'+ tweet.username" class="profile-img">
     <div class="tweet-header__author">
-        <div>{{tweet.firstName}} {{tweet.lastName }}</div>
+        <!-- <div>{{tweet.firstName}} {{tweet.lastName }}</div>
         <div >
             <div>@{{tweet.username}}</div>
             <div>&bull;</div>
             <div>{{tweet.duration}}</div>
-        </div>
+        </div> -->
     </div>
 </div>
-<div class="tweet-content" (click)="goToTweet(tweet.id)">{{tweet.tweetText}}</div>
+<!-- <div class="tweet-content" (click)="goToTweet(tweet.id)">{{tweet.tweetText}}</div> -->
 
-<div *ngIf="tweet.quote" class="tweet-quote-container">
+<!-- <div *ngIf="tweet.quote" class="tweet-quote-container">
     <div  class="tweet-quote">
         <app-tweet [footer]="false" [tweet]="tweet.quote"></app-tweet>
     </div>
-</div>
+</div> -->
 
 <div *ngIf="counters" class="tweet-counters">
     <div> <span>{{tweet.likeCounter}}</span>   Likes</div>
