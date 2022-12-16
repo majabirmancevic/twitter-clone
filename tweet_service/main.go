@@ -36,6 +36,7 @@ func main() {
 		logger.Fatal(err)
 	}
 	defer store.CloseSession()
+
 	store.CreateTables()
 
 	//Initialize the handler and inject said logger

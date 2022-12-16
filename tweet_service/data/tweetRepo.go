@@ -17,7 +17,7 @@ func New(logger *log.Logger) (*TweetRepo, error) {
 
 	// Connect to default keyspace
 	cluster := gocql.NewCluster(db)
-	cluster.Keyspace = "twitter"
+	cluster.Keyspace = "system"
 	session, err := cluster.CreateSession()
 	if err != nil {
 		logger.Println(err)
@@ -61,9 +61,9 @@ func (tr *TweetRepo) CreateTables() {
 	err := tr.session.Query(
 		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s 
 					(regular_username text, description text, id UUID, 
-					PRIMARY KEY (regular_username)) 
-					WITH CLUSTERING ORDER BY (id ASC)`,
+					PRIMARY KEY (regular_username)) `,
 			"tweet_by_regular_user")).Exec()
+	log.Println("KREIRANJE TABELA")
 	if err != nil {
 		tr.logger.Println(err)
 	}

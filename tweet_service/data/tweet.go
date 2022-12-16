@@ -7,9 +7,9 @@ import (
 )
 
 type TweetByRegularUser struct {
-	RegularUsername string
-	Description     string
-	Id              gocql.UUID
+	RegularUsername string     `json:"regular_username"`
+	Description     string     `json:"description"`
+	Id              gocql.UUID `json:"id"`
 }
 
 type TweetsByRegularUser []*TweetByRegularUser
