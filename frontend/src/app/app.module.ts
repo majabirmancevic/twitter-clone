@@ -29,6 +29,10 @@ import { RecaptchaModule} from 'ng-recaptcha';
 import { EmailInfoComponent } from './pages/landing-page/email-info/email-info.component';
 import { BusinessProfilePageComponent } from './pages/business-profile-page/business-profile-page.component';
 import { ChangePasswordComponent } from './pages/change-password/change-password.component';
+import { AuthService } from './services/auth.service';
+import { UserService } from './services/user.service';
+import { PostService } from './services/post.service';
+import { LikeListComponent } from './like-list/like-list.component';
 
 
 
@@ -50,7 +54,8 @@ import { ChangePasswordComponent } from './pages/change-password/change-password
     BusinessProfilePageComponent,
 
     SignUpBusinessComponent,
-      ChangePasswordComponent
+      ChangePasswordComponent,
+      LikeListComponent
 
   ],
 
@@ -74,7 +79,9 @@ import { ChangePasswordComponent } from './pages/change-password/change-password
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,
       multi: true
-    }
+    },
+    AuthService,
+    UserService,
   ],
   bootstrap: [AppComponent]
 })

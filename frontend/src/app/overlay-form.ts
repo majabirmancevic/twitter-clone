@@ -16,9 +16,9 @@ export abstract class OverlayForm extends TweetInput {
   constructor() {
     super();
     this.payload = {
-      text: "",
-      tweetId: 0,
-      type: ""
+      description: "",
+      regular_username: "",
+      
     }
 
     this.form = new FormGroup({

@@ -72,31 +72,17 @@ export class AuthService {
   }
 
   
-  
-  // logout() {
-  //   const self = this;
-  //   return this.http.post("http://localhost:8080/auth/logout", {username: this.getUsername(), refreshToken: this.localStorage.retrieve("refreshToken")}).subscribe({complete(){
-
-  //     self.localStorage.clear('accessToken');
-  //     self.localStorage.clear('refreshToken');
-  //     self.localStorage.clear('expiresAt');
-  //     self.localStorage.clear('username');
-  //     self.localStorage.store('isLoggedIn', false);
-  //     self.router.navigateByUrl("");
-  //   }});
-  // }
-  
-  getUsername(){
-    return localStorage.getItem("username");
+  getUsername() : string{
+    return localStorage.getItem("username")!;
   }
 
   getUser(username: string){
-    return this.http.get(`https://localhost:8002/user/${username}`);
+    return this.http.get(`https://localhost:8000/profile_service/user/${username}`);
   }
 
-  // getRole(){
-
-  // }
+  getJwtToken() {
+    return localStorage.getItem('token');
+  }
 
   // getUsernameByToken(){
   //   return JSON.parse(this.localStorage.retrieve("token")).username
@@ -106,20 +92,17 @@ export class AuthService {
     return localStorage.getItem("isLoggedIn") == "true";
   }
 
-  refreshAccessToken(): Observable<SignInResponsePayload> {
-    return this.http.post<SignInResponsePayload>("http://localhost:8080/auth/refresh-token", {
-      refreshToken: this.localStorage.retrieve("refreshToken"),
-      username: this.getUsername()
-    }).pipe(tap(response=>{
-      this.localStorage.store('accessToken', response.token);
-      //this.localStorage.store('expiresAt', response.expiresAt);
-  }))
-  }
-
   getAccessToken() {
-    return this.localStorage.retrieve("token");
+    return localStorage.getItem("token");
   }
   
+  logout() {
+      this.router.navigateByUrl("");   
+      //this.router.navigate(['']);
+      localStorage.clear()
+
+  }
+
   // findAllUsernames(): Observable<String[]> {
   //   return this.http.get<String[]>("http://localhost:8080/auth/usernames");
   // }

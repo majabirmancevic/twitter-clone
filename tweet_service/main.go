@@ -47,7 +47,7 @@ func main() {
 	router.Use(tweetsHandler.MiddlewareContentTypeSet)
 
 	getTweetIds := router.Methods(http.MethodGet).Subrouter()
-	getTweetIds.HandleFunc("/tweets", tweetsHandler.GetAllRegularUserIds)
+	getTweetIds.HandleFunc("/tweets/users/{tweetId}", tweetsHandler.GetAllRegularUserIds)
 
 	getTweetByRegUser := router.Methods(http.MethodGet).Subrouter()
 	getTweetByRegUser.HandleFunc("/tweets/{username}", tweetsHandler.GetTweetsByRegUser)
@@ -55,6 +55,19 @@ func main() {
 	postTweetForRegUser := router.Methods(http.MethodPost).Subrouter()
 	postTweetForRegUser.HandleFunc("/tweets", tweetsHandler.CraeteTweetForRegUser)
 	postTweetForRegUser.Use(tweetsHandler.MiddlewareTweetForRegUserDeserialization)
+
+	likeTweetForRegUser := router.Methods(http.MethodPost).Subrouter()
+	likeTweetForRegUser.HandleFunc("/like/{id}", tweetsHandler.LikeTweet)
+	likeTweetForRegUser.Use(tweetsHandler.MiddlewareLikeDeserialization)
+
+	getLikesByTweet := router.Methods(http.MethodGet).Subrouter()
+	getLikesByTweet.HandleFunc("/likes/{id}", tweetsHandler.GetLikesByTweet)
+
+	deleteLikesByTweet := router.Methods(http.MethodDelete).Subrouter()
+	deleteLikesByTweet.HandleFunc("/dislike/{tweetId}/{username}", tweetsHandler.DislikeTweet)
+
+	getCountLikesByTweet := router.Methods(http.MethodGet).Subrouter()
+	getCountLikesByTweet.HandleFunc("/likes/count/{id}", tweetsHandler.GetCountByLikes)
 
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}))
 

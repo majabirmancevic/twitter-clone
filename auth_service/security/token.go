@@ -49,7 +49,6 @@ func ParseToken(tokenString string) (*jwt.Token, error) {
 }
 
 type TokenPayload struct {
-	UserId    string
 	Username  string
 	CreatedAt time.Time
 	ExpiresAt time.Time
@@ -64,12 +63,10 @@ func NewTokenPayload(tokenString string) (*TokenPayload, error) {
 	if !token.Valid || !ok {
 		return nil, ErrInvalidToken
 	}
-	id, _ := claims["iss"].(string)
 	username, _ := claims["username"].(string)
 	createdAt, _ := claims["iat"].(float64)
 	expiresAt, _ := claims["exp"].(float64)
 	return &TokenPayload{
-		UserId:    id,
 		Username:  username,
 		CreatedAt: time.Unix(int64(createdAt), 0),
 		ExpiresAt: time.Unix(int64(expiresAt), 0),

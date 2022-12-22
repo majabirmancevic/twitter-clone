@@ -17,8 +17,9 @@ import { BusinessUser } from 'src/app/user-model-business';
 export class ProfilePageComponent extends OverlayForm implements OnInit {
 
   user: RegularUser;
-  tweets: Array<PostResponse>;
+  tweets: Array<PostResponse> = [];
   currentUsername! : string;
+  
 
   constructor(
     private userService: UserService,
@@ -29,7 +30,7 @@ export class ProfilePageComponent extends OverlayForm implements OnInit {
 
     super();
 
-    this.tweets = new Array();
+   
     this.user = {
       name: "",
       lastname: "",
@@ -45,6 +46,10 @@ export class ProfilePageComponent extends OverlayForm implements OnInit {
     this.userService.getRegularUser(this.activateRoute.snapshot.params['username']).subscribe(user => {
       this.user = user;
     });
+    
+    this.postService.getTweetsByUsername(this.activateRoute.snapshot.params['username']).subscribe(posts => {
+      this.tweets = posts;
+    })
 
   }
 
@@ -64,6 +69,8 @@ export class ProfilePageComponent extends OverlayForm implements OnInit {
   fetchTweets() {
     this.postService.getTweetsByUsername(this.user.username).subscribe(response => this.tweets = response);
   }
+
+
 
 }
 function ngOnInit() {

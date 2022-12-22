@@ -21,7 +21,7 @@ export class UserService {
   }
 
   getRegularUser(username: string): Observable<RegularUser>{
-    return this.http.get<RegularUser>(`https://localhost:8002/user/${username}`);
+    return this.http.get<RegularUser>(`https://localhost:8000/profile_service/user/${username}`);
   }
 
 
@@ -30,7 +30,7 @@ export class UserService {
   }
 
   getBusinessUser(username: string): Observable<BusinessUser>{
-    return this.http.get<BusinessUser>(`https://localhost:8002//business/user/${username}`);
+    return this.http.get<BusinessUser>(`https://localhost:8000/profile_service/business/user/${username}`);
   }
 
  

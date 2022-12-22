@@ -46,8 +46,8 @@ export class HomePageComponent implements OnInit {
     })
     this.tweets = new Array();
     this.payload = {
-      text: "",
-      type: ""
+      description:"",
+      regular_username: ""
     }
 
 
@@ -60,18 +60,18 @@ export class HomePageComponent implements OnInit {
         this.toastr.success("Sign In Successful");
       }
     })
-    this.fetchTweets();
+    // this.fetchTweets();
   }
 
-  fetchTweets() {
-    const self = this;
-    this.postService.getAll().subscribe({
-      next(data) {
-        self.tweets = data;
+  // fetchTweets() {
+  //   const self = this;
+  //   this.postService.getAll().subscribe({
+  //     next(data) {
+  //       self.tweets = data;
 
-      }
-    })
-  }
+  //     }
+  //   })
+  // }
 
   ngOnDestroy() {
     if (this.navigationSubscription) {
@@ -80,14 +80,14 @@ export class HomePageComponent implements OnInit {
   }
   tweet() {
 
-    this.payload.text = this.newTweetForm.get("text")?.value;
-    this.payload.type = "TWEET";
+    this.payload.description = this.newTweetForm.get("text")?.value;
+    this.payload.regular_username = this.username;
     const self = this;
     this.postService.tweet(this.payload).subscribe({
       next(response) {
         console.log(response)
         self.newTweetForm.reset();
-        self.router.navigateByUrl("home");
+        //self.router.navigateByUrl("home");
       },
       complete() { },
       error(error) {

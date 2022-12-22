@@ -31,8 +31,9 @@ export class NavbarComponent implements OnInit {
       this.router.navigate(['/profile-business/',this.username]);
     }
   }
-  // logout(){
-  //   this.authService.logout();
-  // }
+  
+  logout(){
+    this.authService.logout();
+  }
 
 }

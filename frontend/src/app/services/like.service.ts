@@ -9,15 +9,19 @@ export class LikeService {
 
   constructor(private http: HttpClient) { }
 
-  isLiked(tweetId: number): Observable<boolean>{
-    return this.http.post<boolean>("http://localhost:8080/likes/is-liked", {tweetId: tweetId});
+  // isLiked(tweetId: number): Observable<boolean>{
+  //   return this.http.post<boolean>("http://localhost:8080/likes/is-liked", {tweetId: tweetId});
+  // }
+
+  like(tweetId: string,username:string){
+    return this.http.post(`https://localhost:8000/tweet_service/like/${tweetId}`, {username: username})
   }
 
-  like(tweetId: number){
-    return this.http.post("http://localhost:8080/likes/like", {tweetId: tweetId})
+  dislike(tweetId: string,username:string){
+    return this.http.delete(`https://localhost:8000/tweet_service/dislike/${tweetId}/${username}`)
   }
 
-  getLikeCounter(tweetId: number): Observable<number>{
-    return this.http.get<number>("http://localhost:8080/likes/like-counter/" + tweetId)
+  getLikeCounter(tweetId: string): Observable<number>{
+    return this.http.get<number>(`https://localhost:8000/tweet_service/likes/count/${tweetId}`)
   }
 }

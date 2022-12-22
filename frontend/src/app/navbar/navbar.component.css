@@ -55,7 +55,7 @@
 }
 
 .button, .logout-btn{
-    width: 212px;
+    width: 150px;
     color: white;
     background-color: #1D9BF0;
     margin-top: 20px;
@@ -72,13 +72,14 @@
     margin: 20px;
     margin-left: 0;
     padding: 15px;
-    background-color: black;
-    color: white;
+    background-color: rgba(0, 0, 0, 0.068);
+    color: rgb(0, 0, 0);
     border-radius: 35px;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 700;
+    border: 0px;
 }
 .logout-btn:hover{
     cursor: pointer;
-    background-color: rgb(71, 71, 71);
+    background-color: rgba(71, 71, 71, 0.849);
 }

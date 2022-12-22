@@ -1,9 +1,22 @@
 <div class="tweet-footer__icons">
+    <div>
+         <fa-icon  *ngIf="!liked"(click)="like()" class="tweet-footer__icon" [icon]="faIcon">
+        </fa-icon> 
+        <fa-icon *ngIf="liked" (click)="dislike()" class="tweet-footer__icon" [icon]="faSolidIcon"
+            [style.color]="'rgb(249, 24, 128)'">
+        </fa-icon>
+    </div>
+    
+    
+    <div>
+        <span  (click)="onPress()">{{likeCounter}}</span>
+        <div  id="comp-render" *ngIf="display">
+            <!-- <app-like-list [likes]="likes"></app-like-list> -->
+            <ul *ngFor="let like of likes" class="list-group">
+                <li class="list-group-item">{{like}}</li>
+            </ul>
+        </div>
+    </div>
 
-    <fa-icon *ngIf="!isActive" (click)="like()" class="tweet-footer__icon" [icon]="faIcon">
-    </fa-icon>
-    <fa-icon *ngIf="isActive" (click)="like()" class="tweet-footer__icon" [icon]="faSolidIcon"
-        [style.color]="'rgb(249, 24, 128)'">
-    </fa-icon>
-    {{tweet.likeCounter}}
+    
 </div>

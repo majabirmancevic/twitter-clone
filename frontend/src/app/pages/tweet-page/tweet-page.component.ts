@@ -36,7 +36,7 @@ export class TweetPageComponent extends OverlayForm implements OnInit {
   }
 
   ngOnInit(): void {
-    this.postService.getRepliesForTweet(this.tweet.id).subscribe(response => this.replies = response);
+    //this.postService.getRepliesForTweet(this.tweet.id).subscribe(response => this.replies = response);
   }
 
   ngOnDestroy() {
@@ -51,11 +51,11 @@ export class TweetPageComponent extends OverlayForm implements OnInit {
 
   reply(){
 
-    this.payload = {
-      text: this.form.get("text")?.value,
-      tweetId: this.tweet.id,
-      type: "REPLY"
-    }
+    // this.payload = {
+    //   text: this.form.get("text")?.value,
+    //   tweetId: this.tweet.id,
+    //   type: "REPLY"
+    // }
 
     const self = this;
     this.postService.tweet(this.payload).subscribe({

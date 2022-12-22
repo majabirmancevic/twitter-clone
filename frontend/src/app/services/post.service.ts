@@ -13,30 +13,20 @@ export class PostService {
   
   
   tweet(payload: PostRequest) {
-    return this.http.post("http://localhost:8080/posts/create", payload);
+    return this.http.post("https://localhost:8000/tweet_service/tweets", payload);
   }
   
-  getRepliesForTweet(tweetId: number): Observable<Array<PostResponse>>{
-    return this.http.get<Array<PostResponse>>("http://localhost:8080/posts/replies-for-tweet/" + tweetId);
-  }
+ 
   
   getTweetsByUsername(username: string): Observable<Array<PostResponse>>{
-    return this.http.get<Array<PostResponse>>("http://localhost:8080/posts/tweets-by-username/" + username);
+    return this.http.get<Array<PostResponse>>(`https://localhost:8000/tweet_service/tweets/${username}`);
   }
   
-  getRetweetsByUsername(username: string): Observable<Array<PostResponse>> {
-    return this.http.get<Array<PostResponse>>("http://localhost:8080/posts/retweets-by-username/" + username);
+  getLikesByTweet(tweetId: string): Observable<Array<string>>{
+    return this.http.get<Array<string>>(`https://localhost:8000/tweet_service/tweets/users/${tweetId}`);
   }
   
-  getRepliesByUsername(username: string): Observable<Array<PostResponse>> {
-    return this.http.get<Array<PostResponse>>("http://localhost:8080/posts/replies-by-username/" + username);
-  }
-  
-  getLikesByUsername(username: string): Observable<Array<PostResponse>> {
-    return this.http.get<Array<PostResponse>>("http://localhost:8080/posts/liked-by-username/" + username);
-  }
-  
-  getAll(): Observable<PostResponse[]> {
-    return this.http.get<PostResponse[]>("http://localhost:8080/posts");
-  }
+  // getAll(): Observable<PostResponse[]> {
+  //   return this.http.get<PostResponse[]>("http://localhost:8080/posts");
+  // }
 }

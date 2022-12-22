@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { PostResponse } from '../payloads/response/post';
+import { PostService } from '../services/post.service';
 import { TweetInput } from '../tweet-input';
 
 @Component({
@@ -7,21 +9,29 @@ import { TweetInput } from '../tweet-input';
   templateUrl: './tweet.component.html',
   styleUrls: ['./tweet.component.css']
 })
-export class TweetComponent extends TweetInput implements OnInit {
+export class TweetComponent  implements OnInit {
 
   @Input() footer: Boolean = true;
   @Input() counters: Boolean = false;
+  @Input() tweet!: PostResponse ;
 
-  constructor(private router: Router) { 
-    super();
+
+
+  likes: string[] = [];
+
+  constructor() {
+  
   }
 
   ngOnInit(): void {
+    
   }
 
-  goToTweet(tweetId: number){
+  
+  
+  // goToTweet(tweetId: number){
     
-    this.router.navigate(["/tweet/" + tweetId], {state: {data: this.tweet}});
-  }
+  //   this.router.navigate(["/tweet/" + tweetId], {state: {data: this.tweet}});
+  // }
 
 }

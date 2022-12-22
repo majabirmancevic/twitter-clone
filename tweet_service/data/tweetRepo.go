@@ -3,6 +3,7 @@ package data
 import (
 	"fmt"
 	"github.com/gocql/gocql"
+	uuid "github.com/satori/go.uuid"
 	"log"
 	"os"
 )
@@ -60,8 +61,8 @@ func (tr *TweetRepo) CloseSession() {
 func (tr *TweetRepo) CreateTables() {
 	err := tr.session.Query(
 		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s 
-					(regular_username text, description text, id UUID,like_counter 
-					PRIMARY KEY (regular_username)) `,
+					(regular_username text, description text, id text, 
+					PRIMARY KEY ((regular_username),id)) `,
 			"tweet_by_regular_user")).Exec()
 	log.Println("KREIRANJE TABELA")
 	if err != nil {
@@ -70,45 +71,23 @@ func (tr *TweetRepo) CreateTables() {
 
 	err = tr.session.Query(
 		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s 
-					(regular_username text, tweet_id UUID, 
-					PRIMARY KEY (tweet_id)) `,
-			"likes_by_regular_user")).Exec()
+					(username text, tweet_id text, id text,
+					PRIMARY KEY ((tweet_id),username)) `,
+			"likes_by_user")).Exec()
 	log.Println("KREIRANJE TABELA")
 	if err != nil {
 		tr.logger.Println(err)
 	}
 }
 
-func (tr *TweetRepo) GetTweetByID(id string) (*TweetByRegularUser, error) {
-
-	scanner := tr.session.Query(`SELECT regular_username, description,like_counter, id FROM tweet_by_regular_user WHERE id = ?`,
-		id).Iter().Scanner()
-
-	var tweet *TweetByRegularUser
-	for scanner.Next() {
-		//var tweet TweetByRegularUser
-		err := scanner.Scan(&tweet.RegularUsername, &tweet.Description,&tweet.LikeCounter, &tweet.Id)
-		if err != nil {
-			tr.logger.Println(err)
-			return nil, err
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		tr.logger.Println(err)
-		return nil, err
-	}
-	return tweet, nil
-}
-
 func (tr *TweetRepo) GetTweetsByUser(username string) (TweetsByRegularUser, error) {
-	scanner := tr.session.Query(`SELECT regular_username, description,like_counter, id FROM tweet_by_regular_user WHERE regular_username = ?`,
+	scanner := tr.session.Query(`SELECT regular_username, description, id FROM tweet_by_regular_user WHERE regular_username = ?`,
 		username).Iter().Scanner()
 
 	var tweets TweetsByRegularUser
 	for scanner.Next() {
 		var tweet TweetByRegularUser
-		err := scanner.Scan(&tweet.RegularUsername, &tweet.Description,&tweet.LikeCounter, &tweet.Id)
+		err := scanner.Scan(&tweet.RegularUsername, &tweet.Description, &tweet.Id)
 		if err != nil {
 			tr.logger.Println(err)
 			return nil, err
@@ -122,12 +101,61 @@ func (tr *TweetRepo) GetTweetsByUser(username string) (TweetsByRegularUser, erro
 	return tweets, nil
 }
 
+func (tr *TweetRepo) GetLikesByTweet(tweetId string) (Likes, error) {
+	scanner := tr.session.Query(`SELECT username,tweet_id,id  FROM likes_by_user WHERE tweet_id = ?`,
+		tweetId).Iter().Scanner()
+
+	var likes Likes
+	for scanner.Next() {
+		var like Like
+		err := scanner.Scan(&like.Username, &like.TweetId, &like.Id)
+		if err != nil {
+			tr.logger.Println(err)
+			return nil, err
+		}
+		likes = append(likes, &like)
+	}
+	if err := scanner.Err(); err != nil {
+		tr.logger.Println(err)
+		return nil, err
+	}
+	return likes, nil
+}
+
 func (tr *TweetRepo) InsertTweetByRegUser(regUserTweet *TweetByRegularUser) error {
-	tweetId, _ := gocql.RandomUUID()
+	//tweetId, _ := gocql.RandomUUID()
+	tweetId := uuid.NewV4()
+	strTweet := tweetId.String()
 	err := tr.session.Query(
-		`INSERT INTO tweet_by_regular_user (regular_username, description,like_counter, id) 
-		VALUES (?, ?, ?,?)`,
-		regUserTweet.RegularUsername, regUserTweet.Description, tweetId).Exec()
+		`INSERT INTO tweet_by_regular_user (regular_username, description,id) 
+		VALUES (?, ?, ?)`,
+		regUserTweet.RegularUsername, regUserTweet.Description, strTweet).Exec()
+	if err != nil {
+		tr.logger.Println(err)
+		return err
+	}
+	return nil
+}
+
+func (tr *TweetRepo) DeleteLikeByUser(tweetId string, username string) error {
+
+	err := tr.session.Query(`DELETE FROM likes_by_user WHERE tweet_id = ? AND username = ?`, tweetId, username).Exec()
+	if err != nil {
+		tr.logger.Println("Erorr : ", err)
+		return err
+	}
+	return nil
+}
+
+func (tr *TweetRepo) InsertLikeByRegUser(username string, id string) error {
+
+	likeId := uuid.NewV4()
+	strLike := likeId.String()
+
+	err := tr.session.Query(
+		`INSERT INTO likes_by_user (username, tweet_id, id) 
+		VALUES (?, ?, ?)`,
+		username, id, strLike).Exec()
 	if err != nil {
 		tr.logger.Println(err)
 		return err
@@ -138,9 +166,9 @@ func (tr *TweetRepo) InsertTweetByRegUser(regUserTweet *TweetByRegularUser) erro
 // NoSQL: Performance issue, we never want to fetch all the data
 // (In order to get all student ids we need to contact every partition which are usually located on different servers!)
 // Here we are doing it for demonstration purposes (so we can see all student/predmet ids)
-func (tr *TweetRepo) GetDistinctIds(idColumnName string, tableName string) ([]string, error) {
+func (tr *TweetRepo) GetDistinctIds(idColumnName string, tableName string, tweetId string) ([]string, error) {
 	scanner := tr.session.Query(
-		fmt.Sprintf(`SELECT DISTINCT %s FROM %s`, idColumnName, tableName)).
+		fmt.Sprintf(`SELECT %s FROM %s WHERE tweet_id = '%s'`, idColumnName, tableName, tweetId)).
 		Iter().Scanner()
 	var ids []string
 	for scanner.Next() {
