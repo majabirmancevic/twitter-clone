@@ -4,22 +4,8 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95cb019e-a641-43ab-8939-55bd90136758" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/docker-compose.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/handlers/user_handler.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/security/password.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/security/token.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth-service/config/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/config/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth-service/config/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/config/server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth-service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth-service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth-service/model/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/model/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth-service/model/user_store.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/model/user_store.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth-service/repository/users.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/repository/users.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth-service/service/user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/service/user_service.go" afterDir="false" />
+    <list default="true" id="0cc9b522-92b9-4321-bd0f-5983457448ff" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/tweet_service/data/tweetRepo.go" beforeDir="false" afterPath="$PROJECT_DIR$/tweet_service/data/tweetRepo.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,22 +37,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultGoTemplateProperty": "Go File",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.go.format.on.save.advertiser.fired": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
-    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "go.import.settings.migrated": "true",
-    "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "C:/Users/Maja/Desktop/TRECA GODINA SIT-2020/ZIMSKI SEMESTAR/twitter-clone/auth-service"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.format.on.save.advertiser.fired&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Maja/Desktop/TRECA GODINA SIT-2020/ZIMSKI SEMESTAR/twitter-clone/auth-service&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Maja\Desktop\TRECA GODINA SIT-2020\ZIMSKI SEMESTAR\twitter-clone\auth-service" />
