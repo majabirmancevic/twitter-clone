@@ -3,9 +3,11 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"strings"
 	"tweet_service/data"
 )
 
@@ -15,6 +17,7 @@ type TweetsHandler struct {
 	logger *log.Logger
 	// NoSQL: injecting student repository
 	repo *data.TweetRepo
+	//authClient *auth.Client
 }
 
 // Injecting the logger makes this code much more testable.
@@ -141,6 +144,20 @@ func (s *TweetsHandler) GetCountByLikes(rw http.ResponseWriter, h *http.Request)
 }
 
 func (s *TweetsHandler) CraeteTweetForRegUser(rw http.ResponseWriter, h *http.Request) {
+
+	//token, er := ExtractToken(h)
+	//s.logger.Println("TOKEN : ", token)
+	//s.logger.Println("Erorr : ", er)
+	//if er != nil {
+	//	http.Error(rw, er.Error(), http.StatusForbidden)
+	//}
+	//
+	//err := s.authClient.VerifyToken(token)
+	//s.logger.Println("ERROR VERIFY : ", err)
+	//if err != nil {
+	//	http.Error(rw, err.Error(), http.StatusForbidden)
+	//}
+
 	userTweet := h.Context().Value(KeyTweet{}).(*data.TweetByRegularUser)
 	err := s.repo.InsertTweetByRegUser(userTweet)
 	if err != nil {
@@ -204,4 +221,17 @@ func (s *TweetsHandler) MiddlewareContentTypeSet(next http.Handler) http.Handler
 
 		next.ServeHTTP(rw, h)
 	})
+}
+
+func ExtractToken(r *http.Request) (string, error) {
+	// Authorization => Bearer Token...
+	header := strings.TrimSpace(r.Header.Get("Authorization"))
+	log.Println("HEADER ", header)
+	splitted := strings.Split(header, " ")
+	log.Println("SPLITTED ", header)
+	if len(splitted) != 2 {
+		log.Println("error on extract token from header:", header)
+		return "", errors.New("invalid jwt")
+	}
+	return splitted[1], nil
 }

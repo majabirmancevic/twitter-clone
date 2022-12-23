@@ -6,18 +6,6 @@ import (
 	"io"
 )
 
-//type SignUpRegularRequest struct {
-//	Name            string `bson:"name" json:"name" binding:"required"`
-//	Lastname        string `bson:"lastname" json:"lastname" binding:"required"`
-//	Gender          string `bson:"gender" json:"gender" binding:"required"`
-//	Age             uint16 `bson:"age" json:"age" binding:"required"`
-//	PlaceOfLiving   string `bson:"placeOfLiving" json:"placeOfLiving" binding:"required"`
-//	Username        string `bson:"username" json:"username" binding:"required"`
-//	Password        string `bson:"password" json:"password" binding:"required,min=8"`
-//	PasswordConfirm string `bson:"passwordConfirm,omitempty" json:"passwordConfirm" binding:"required"`
-//	Role            string `json:"role" bson:"role"`
-//}
-
 type RegularProfiles []*RegularProfile
 type BusinessProfiles []*BusinessProfile
 

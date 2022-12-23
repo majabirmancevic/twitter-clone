@@ -45,6 +45,7 @@ export class LikeComponent extends SingleAction implements OnInit {
       this.updateCounter();
     });
     this.liked = true;
+    
   }
 
   dislike(){
@@ -53,6 +54,7 @@ export class LikeComponent extends SingleAction implements OnInit {
       this.updateCounter();
     });
     this.liked = false;
+    
   }
 
   viewLike() {
@@ -65,6 +67,7 @@ export class LikeComponent extends SingleAction implements OnInit {
     this.display = !this.display
     console.log("KLIKNUTO NA KAUNTER")
     console.log(this.display)
+    this.viewLike()
   }
 
   updateCounter(){

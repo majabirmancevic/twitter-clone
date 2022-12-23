@@ -103,6 +103,26 @@ export class AuthService {
 
   }
 
+  private parseToken(){
+    let jwt = localStorage.getItem('token');
+    if(jwt !== null){
+      let jwtData = jwt.split('.')[1];
+      let decodedJwtJsonData = atob(jwtData);
+      let decodedJwtData = JSON.parse(decodedJwtJsonData);
+      return decodedJwtData
+    }
+  }
+
+  getUsernameFromToken(): string{
+    let token = this.parseToken();
+
+    if(token) {
+      return this.parseToken()['sub']
+    }
+    return "";
+  }
+
+ 
   // findAllUsernames(): Observable<String[]> {
   //   return this.http.get<String[]>("http://localhost:8080/auth/usernames");
   // }

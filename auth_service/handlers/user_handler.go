@@ -5,6 +5,7 @@ import (
 	"auth-service/repository"
 	"auth-service/security"
 	"context"
+	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -110,4 +111,33 @@ func (p *AuthHandler) MiddlewareContentTypeSet(next http.Handler) http.Handler {
 		next.ServeHTTP(rw, h)
 
 	})
+}
+
+func (p *AuthHandler) Authenticate(w http.ResponseWriter, r *http.Request) {
+
+	var tokenStr string
+	err := json.NewDecoder(r.Body).Decode(&tokenStr)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	//tokenString, err := security.ExtractToken(r)
+	//if err != nil {
+	//	security.WriteError(w, http.StatusUnauthorized, security.ErrUnauthorized)
+	//	return
+	//}
+	token, err := security.ParseToken(tokenStr)
+	if err != nil {
+		log.Println("error on parse token:", err.Error())
+		security.WriteError(w, http.StatusUnauthorized, security.ErrUnauthorized)
+		return
+	}
+	if !token.Valid {
+		log.Println("invalid token", tokenStr)
+		security.WriteError(w, http.StatusUnauthorized, security.ErrUnauthorized)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

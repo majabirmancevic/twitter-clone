@@ -40,6 +40,7 @@ export class HomePageComponent implements OnInit {
   
 
     this.username = this.auhtService.getUsername();
+    console.log("USERNAME TOKEN : ",this.auhtService.getUsernameFromToken())
 
     this.newTweetForm = new FormGroup({
       text: new FormControl("", Validators.required)

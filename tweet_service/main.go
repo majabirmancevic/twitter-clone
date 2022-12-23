@@ -39,6 +39,7 @@ func main() {
 
 	store.CreateTables()
 
+	//authClient := auth.NewClient()
 	//Initialize the handler and inject said logger
 	tweetsHandler := handlers.NewTweetsHandler(logger, store)
 
