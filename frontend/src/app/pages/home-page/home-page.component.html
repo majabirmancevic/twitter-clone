@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+
+
+<body>
+    <header class="sidebar">
+        <app-navbar></app-navbar>
+    </header>
+    
+    <main class="main">  
+          <div class="main-container">
+            <div class="tweet-form__container">
+               
+                <div class="tweet-form">
+                    <div>
+                        <form id="newTweetForm" [formGroup]="newTweetForm" (ngSubmit)="tweet()">
+                            <textarea [formControlName]="'text'" id="text-area" class="tweet-form__text-area" name="text-area" rows="4"
+                                cols="50" placeholder="What's Happenning?" required></textarea>
+                        </form>
+                    </div>
+
+                    <div class="tweet-form__footer">
+                        <div class="tweet-form__footer-icons">
+                        
+                        </div>
+                        <input class="tweet-form__footer-button" type="submit" form="newTweetForm" value="Tweet">
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="tweet" *ngFor="let tweet of tweets" >
+                <app-tweet [tweet]="tweet"></app-tweet>
+            </div> -->
+        </div>
+        <div class="trends"></div>
+    </main>
+</body>
+
+</html>

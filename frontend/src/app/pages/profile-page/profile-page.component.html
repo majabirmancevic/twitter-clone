@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+    <header class="sidebar">
+        <app-navbar></app-navbar>
+    </header>
+
+    <main class="main">
+        <div class="main-container">
+            <div>           
+                <div class="row mb-5 gx-5">
+                    <!-- Contact detail -->
+                    <div class="col-xxl-8 mb-5 mb-xxl-0">
+                        <div class="bg-secondary-soft px-4 py-5 rounded">
+                            <div class="row g-3">
+                                <h5 class="mb-4 mt-0">Profile detail of {{user.name}} {{user.lastname}}</h5>
+
+                                <!-- Name -->
+                                <div class="col-md-5">
+                                    <label for="name">Name</label><br>
+                                    <input type="text"class="form-control" value={{user.name}} readonly>
+                                </div> 
+                                <!-- Lastname -->
+                                <div class="col-md-7">
+                                    <label for="lastname">Last name</label>
+                                    <input type="text" class="form-control"  value={{user.lastname}} readonly>
+                                </div>
+                                                      
+                                <div class="col-md-12">
+                                    <label class="form-label"> Email</label>
+                                    <input type="text" class="form-control"  value={{user.email}} readonly>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <label class="form-label">Age</label>
+                                    <input type="text" class="form-control" value={{user.age}} readonly>
+                                </div>
+
+                                
+                                <div class="col-md-2">
+                                    <label class="form-label">Gender</label>
+                                    <input type="text" class="form-control" value={{user.gender}} readonly>
+                                </div>
+
+                                
+                                <div class="col-md-5">
+                                    <label class="form-label">Place of living</label>
+                                    <input type="text" class="form-control" value={{user.placeOfLiving}} readonly>
+                                </div>
+                                
+                                <div class="col-md-3">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" class="form-control" value={{user.username}} readonly>
+                                
+                                </div>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary"(click)="goToChangePass()">Change password</button><hr>
+                <div>
+                    <div *ngFor="let tweet of tweets" class="tweets">
+                        <app-tweet [tweet]="tweet"></app-tweet>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

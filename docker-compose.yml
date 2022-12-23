@@ -1,0 +1,117 @@
+version: "3.8"
+
+services:
+
+  api_gateway:
+    build:
+      context: .
+      dockerfile: ./api_gateway/Dockerfile
+    container_name: api_gateway
+    restart: on-failure
+    environment:
+      API_GATE_PORT : 8000
+      AUTH_HOST : auth_service
+      AUTH_PORT: 8001
+    ports:
+      - '8000:8000'
+
+  auth_service:
+    build:
+      context: .
+      dockerfile: ./auth_service/Dockerfile
+    restart: always
+    container_name: "auth_service"
+    hostname: "auth_service"
+    ports:
+      - "8001:8001"
+    #Will be accessible through os.Getenv("PORT")
+    environment:
+      AUTH_PORT: 8001
+      # NoSQL: environment variable holding connection URI for Mongo database
+      # protocol://username:password@hostname:port
+      #- MONGO_DB_URI=mongodb://root:pass@mongo:27017
+      MONGO_DB_URI: mongodb://mongo:27017
+      JWT_SECRET_KEY: c5VjcmV0
+
+    depends_on:
+      - mongo
+
+  profile_service:
+    build:
+      context: .
+      dockerfile: ./profile_service/Dockerfile
+    restart: always
+    container_name: "profile_service"
+    hostname: "profile_service"
+    ports:
+      - "8002:8002"
+    #Will be accessible through os.Getenv("PORT")
+    environment:
+      PROFILE_PORT: 8002
+      # NoSQL: environment variable holding connection URI for Mongo database
+      # protocol://username:password@hostname:port
+      #- MONGO_DB_URI=mongodb://root:pass@mongo:27017
+      MONGO_DB_URI: mongodb://mongo:27017
+    # JWT_SECRET_KEY: c5VjcmV0
+
+    depends_on:
+      - mongo
+
+
+  tweet_service:
+    build:
+      context: .
+      dockerfile: ./tweet_service/Dockerfile
+    restart: always
+    container_name: "tweet_service"
+    hostname: "tweet_service"
+    ports:
+      - "8003:8003"
+    #Will be accessible through os.Getenv("PORT")
+    environment:
+      TWEET_PORT: 8003
+      # NoSQL: environment variable holding connection URI for Cassandra database
+      CASS_DB: cassandra:9042
+    # JWT_SECRET_KEY: c5VjcmV0
+
+    depends_on:
+      cassandra:
+        condition: service_healthy
+
+  mongo:
+    image: mongo:4.4.6
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      #MONGO_INITDB_ROOT_USERNAME: root
+      #MONGO_INITDB_ROOT_PASSWORD: pass
+      MONGO_INITDB_DATABASE: twitter
+    # Docker healtcheck - checks if database is "alive"
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok'
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - mongo_store:/data/db
+
+
+  # NoSQL: CassandraDB
+  cassandra:
+    image: cassandra:4.0
+    restart: always
+    ports:
+      - "9042:9042"
+    # Docker healtcheck - checks if database is "alive"
+    healthcheck:
+      test: [ "CMD-SHELL", "cqlsh -e 'describe cluster'" ]
+      interval: 15s
+      timeout: 5s
+      retries: 15
+    volumes:
+      - cass_store:/var/lib/cassandra/data
+
+volumes:
+  mongo_store:
+  cass_store:

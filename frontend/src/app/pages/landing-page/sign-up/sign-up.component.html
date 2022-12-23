@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    </head>
+    <body class="container">
+        <form [formGroup]="form" (ngSubmit)="signUp()">
+            <label>Name</label>
+            <div>
+                <span *ngIf="!form.get('name')?.valid && form.get('name')?.touched" style="color:red ;">Please enter your first name</span>
+                <input [formControlName]="'name'" type="text">
+            </div>
+            
+            <label>Last Name</label>
+            <div>
+                <span *ngIf="!form.get('lastname')?.valid && form.get('lastname')?.touched" style="color:red ;">Please enter your last name</span>
+                <input  [formControlName]="'lastname'" type="text">
+            </div> 
+
+            <label>Gender</label>
+            <div>
+                <span *ngIf="!form.get('gender')?.valid && form.get('gender')?.touched" style="color:red ;">Please enter gender</span>
+                <input  [formControlName]="'gender'" type="text" placeholder="M/F">
+            </div> 
+
+            <label>Age</label>
+            <div>
+                <span *ngIf="!form.get('age')?.valid && form.get('age')?.touched" style="color:red ;">Please enter your age</span>
+                <input  [formControlName]="'age'" type="number" min="1">
+            </div> 
+            
+            <label>Place of living</label>
+            <div>
+                <span *ngIf="!form.get('placeOfLiving')?.valid && form.get('placeOfLiving')?.touched" style="color:red ;">Please enter your place of living</span>
+                <input  [formControlName]="'placeOfLiving'" type="text">
+            </div> 
+
+            <label>Email</label>
+            <div>
+                <span *ngIf="!form.get('email')?.valid && form.get('email')?.touched" style="color:red ;">Please enter a valid email</span>
+                <input  [formControlName]="'email'" type="email" required autofocus>
+            </div>
+
+            <label>Username</label>
+            <div>
+                <span *ngIf="username.errors?.['required'] && form.get('username')?.touched" style="color:red ;">Please enter a username</span>
+                <span *ngIf="username.errors?.['usernameExists']" style="color:red ;">This username has been taken</span>
+                <input  [formControlName]="'username'" type="text">
+            </div> 
+             
+            <label>Password</label>
+            <div>
+                <span *ngIf="!form.get('password')?.valid && form.get('password')?.touched" style="color:red ;">Password cannot be empty</span>
+                <input  [formControlName]="'password'" type="password">
+            </div>
+            
+            <div [hidden]="captcha">
+                
+                <re-captcha (resolved)="resolved($event)" siteKey="6LepB04jAAAAALhsR6ufvQAEkMXXupINYW_Bz5wW"></re-captcha>
+            </div>
+
+            <div [hidden]="!captcha">
+                <input  type="submit" value="Sign up">
+            </div>
+            
+            <!-- <input  type="submit" value="Sign up"> -->
+        </form>
+    </body>
+</html>
