@@ -1,0 +1,23 @@
+
+    <div class="sidebar-container">
+        <div>
+            <div>
+                <img src="assets/svg/twitter.svg" class="logo">
+            </div>
+            <div class="sidebar-item active" [ngClass]="{'active': getUrl() === '/home'}">
+                <img src="assets/svg/home.svg" class="sidebar-item-icon ">
+                <div [routerLink]="'/home'" class="icon-label">Home</div>
+            </div>
+            
+  
+            <div  class="sidebar-item" (click)="navigate()" >     
+                <img src="assets/svg/profile.svg" class="sidebar-item-icon" >
+                <div class="icon-label">Profile</div>
+            </div>
+            <div>
+                <button class="logout-btn" (click)="logout()">Logout</button>
+            </div>
+            
+        </div>
+        
+    </div>

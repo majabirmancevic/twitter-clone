@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="95cb019e-a641-43ab-8939-55bd90136758" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auth-service/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auth-service/docker-compose.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auth-service/handlers/user_handler.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auth-service/main.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auth-service/security/password.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/auth-service/security/token.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth-service/config/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/config/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth-service/config/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/config/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth-service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth-service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth-service/model/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/model/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth-service/model/user_store.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/model/user_store.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth-service/repository/users.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/repository/users.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth-service/service/user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/service/user_service.go" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" url="file://F:/go1.19.2" />
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="feature/feature_tweet" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2GzqFpo56wAHu8KJtbqJd0iESIh" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultGoTemplateProperty": "Go File",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.go.format.on.save.advertiser.fired": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "go.import.settings.migrated": "true",
+    "go.sdk.automatically.set": "true",
+    "last_opened_file_path": "C:/Users/Maja/Desktop/TRECA GODINA SIT-2020/ZIMSKI SEMESTAR/twitter-clone/auth-service"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Maja\Desktop\TRECA GODINA SIT-2020\ZIMSKI SEMESTAR\twitter-clone\auth-service" />
+      <recent name="C:\Users\Maja\Desktop\TRECA GODINA SIT-2020\ZIMSKI SEMESTAR\twitter-clone" />
+      <recent name="C:\Users\Maja\Desktop\TRECA GODINA SIT-2020\ZIMSKI SEMESTAR\twitter-clone\auth-service\config" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Maja\Desktop\TRECA GODINA SIT-2020\ZIMSKI SEMESTAR\twitter-clone\tweet-service" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VgoProject">
+    <settings-migrated>true</settings-migrated>
+  </component>
+</project>
