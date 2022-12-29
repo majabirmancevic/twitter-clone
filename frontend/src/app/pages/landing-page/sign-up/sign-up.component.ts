@@ -29,7 +29,7 @@ export class SignUpComponent implements OnInit {
         validators: [Validators.required],
         updateOn: "blur"
       }), 
-      password: new FormControl("", Validators.required)
+      password: new FormControl("", [Validators.required, Validators.min(8)])
     });
 
     this.payload = {

@@ -56,4 +56,8 @@ export class SignInComponent implements OnInit {
     });
   }
 
+  goTo(){
+    this.router.navigate(["/email-info"]);
+  }
+
 }

@@ -116,6 +116,8 @@ func (p *AuthHandler) MiddlewareContentTypeSet(next http.Handler) http.Handler {
 func (p *AuthHandler) Authenticate(w http.ResponseWriter, r *http.Request) {
 
 	var tokenStr string
+	p.logger.Println("STRING ZA PROVERU : ", tokenStr)
+
 	err := json.NewDecoder(r.Body).Decode(&tokenStr)
 	if err != nil {
 		log.Println(err)

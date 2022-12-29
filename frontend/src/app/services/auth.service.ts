@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { LocalStorageService } from 'ngx-webstorage';
 import { map, tap, Observable } from 'rxjs';
+import { ResetPasswordComponent } from '../pages/reset-password/reset-password.component';
+import { ResetPasswordPayload } from '../payloads/request/reset-password';
 import { SignInRequestPayload } from '../payloads/request/sign-in';
 import { SignUpPayload } from '../payloads/request/sign-up';
 import { SignUpPayloadBusiness } from '../payloads/request/sign-up-business';
@@ -71,6 +73,25 @@ export class AuthService {
     
   }
 
+  sendverifyEmail(email: string,username:string) { 
+    const headers = new HttpHeaders({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }); 
+    const options = { headers: headers };
+    return this.http.post(`https://localhost:8000/profile_service/sendEmail/${username}`,email, options);
+    
+  }
+
+  resetPassword(payload: ResetPasswordPayload, username: string) { 
+    const headers = new HttpHeaders({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }); 
+    const options = { headers: headers };
+    return this.http.post(`https://localhost:8000/profile_service/resetPassword/${username}`, payload, options);
+    
+  }
   
   getUsername() : string{
     return localStorage.getItem("username")!;

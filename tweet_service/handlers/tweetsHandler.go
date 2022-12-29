@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 	"tweet_service/data"
 )
 
@@ -17,7 +18,6 @@ type TweetsHandler struct {
 	logger *log.Logger
 	// NoSQL: injecting student repository
 	repo *data.TweetRepo
-	//authClient *auth.Client
 }
 
 // Injecting the logger makes this code much more testable.
@@ -143,6 +143,11 @@ func (s *TweetsHandler) GetCountByLikes(rw http.ResponseWriter, h *http.Request)
 	}
 }
 
+func httpClient() *http.Client {
+	client := &http.Client{Timeout: 10 * time.Second}
+	return client
+}
+
 func (s *TweetsHandler) CraeteTweetForRegUser(rw http.ResponseWriter, h *http.Request) {
 
 	//token, er := ExtractToken(h)
@@ -150,13 +155,16 @@ func (s *TweetsHandler) CraeteTweetForRegUser(rw http.ResponseWriter, h *http.Re
 	//s.logger.Println("Erorr : ", er)
 	//if er != nil {
 	//	http.Error(rw, er.Error(), http.StatusForbidden)
+	//	return
 	//}
 	//
-	//err := s.authClient.VerifyToken(token)
-	//s.logger.Println("ERROR VERIFY : ", err)
-	//if err != nil {
-	//	http.Error(rw, err.Error(), http.StatusForbidden)
+	//c := httpClient()
+	//responseErr := auth.VerifyToken(c, http.MethodPost, token)
+	//if responseErr != nil {
+	//	http.Error(rw, er.Error(), http.StatusForbidden)
+	//	return
 	//}
+	//s.logger.Println("RESPONSE : ", responseErr)
 
 	userTweet := h.Context().Value(KeyTweet{}).(*data.TweetByRegularUser)
 	err := s.repo.InsertTweetByRegUser(userTweet)

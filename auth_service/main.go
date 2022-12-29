@@ -51,8 +51,8 @@ func main() {
 	loginRouter.HandleFunc("/login", userHandler.SignIn)
 	loginRouter.Use(userHandler.MiddlewareLoginDeserialization)
 
-	//verifyToken := router.Methods(http.MethodPost).Subrouter()
-	//verifyToken.HandleFunc("/verifyToken", userHandler.Authenticate)
+	verifyToken := router.Methods(http.MethodPost).Subrouter()
+	verifyToken.HandleFunc("/verifyToken", userHandler.Authenticate)
 
 	// ZA PROVERU PRISTUPA RUTA NA OSNOVU TOKENA
 	//middlewares.Authenticate(userHandler.SignIn)

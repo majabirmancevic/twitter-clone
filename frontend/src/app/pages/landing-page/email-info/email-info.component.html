@@ -1,7 +1,21 @@
-<div class="container" >
-    <div class="alert alert-success" role="alert" >
-        <h4 class="alert-heading"> Check your email address</h4>
-        <hr>
-        <p>We have sent you a verification code.</p></div> 
-   
-  </div>
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    </head>
+    <body class="verifContainer">
+        <form [formGroup]="form" (ngSubmit)="verifyEmail()">
+            <div class="card">
+                    <div class="card-body">
+                    <h5 class="card-title">Enter your email address</h5>
+                    <input [formControlName]="'email'" type="text" id="inputCode"> <br><br>
+                    <h5 class="card-title">Enter your username</h5>
+                    <input [formControlName]="'username'" type="text" id="inputCode"> <br><br>
+                    <input [disabled]="!form.valid" type="submit" value="Send email" id="verifyButton">
+                </div>
+            </div>         
+        </form>
+    </body>
+</html>

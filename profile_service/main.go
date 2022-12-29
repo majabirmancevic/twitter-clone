@@ -57,6 +57,10 @@ func main() {
 	changePasswordRouter.HandleFunc("/changePassword/{username}", userHandler.PasswordChange)
 	changePasswordRouter.Use(userHandler.MiddlewarePasswordDeserialization)
 
+	resetPasswordRouter := router.Methods(http.MethodPost).Subrouter()
+	resetPasswordRouter.HandleFunc("/resetPassword/{username}", userHandler.ResetPassword)
+	resetPasswordRouter.Use(userHandler.MiddlewareResetPasswordDeserialization)
+
 	verifyRouter := router.Methods(http.MethodGet).Subrouter()
 	verifyRouter.HandleFunc("/verifyEmail/{code}", userHandler.VerifyEmail)
 
@@ -77,6 +81,9 @@ func main() {
 
 	deleteRouter := router.Methods(http.MethodDelete).Subrouter()
 	deleteRouter.HandleFunc("/", userHandler.DeleteAll)
+
+	sendMail := router.Methods(http.MethodPost).Subrouter()
+	sendMail.HandleFunc("/sendEmail/{username}", userHandler.SendMail)
 
 	// ZA PROVERU PRISTUPA RUTA NA OSNOVU TOKENA
 	//middlewares.Authenticate(userHandler.SignIn)

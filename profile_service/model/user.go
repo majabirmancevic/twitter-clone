@@ -68,6 +68,24 @@ type PasswordDto struct {
 	NewPassword string `bson:"newPassword" json:"newPassword"`
 }
 
+type ResetPassword struct {
+	NewPassword       string `bson:"newPassword" json:"newPassword"`
+	RepeatNewPassword string `bson:"repeatNewPassword" json:"repeatNewPassword"`
+}
+
+// -------------------------------------------------------------------------------------------------
+func (p *ResetPassword) FromJSON(r io.Reader) error {
+	d := json.NewDecoder(r)
+	return d.Decode(p)
+}
+
+func (p *ResetPassword) ToJSON(w io.Writer) error {
+	e := json.NewEncoder(w)
+	return e.Encode(p)
+}
+
+//---------------------------------------------------------------------------------------------------
+
 func NewUserResponse(user *RegularProfile) DBRegularResponse {
 	return DBRegularResponse{
 		ID:            user.ID,
