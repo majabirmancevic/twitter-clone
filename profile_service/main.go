@@ -55,6 +55,7 @@ func main() {
 
 	changePasswordRouter := router.Methods(http.MethodPost).Subrouter()
 	changePasswordRouter.HandleFunc("/changePassword/{username}", userHandler.PasswordChange)
+	changePasswordRouter.Use(userHandler.Authenticate)
 	changePasswordRouter.Use(userHandler.MiddlewarePasswordDeserialization)
 
 	resetPasswordRouter := router.Methods(http.MethodPost).Subrouter()
@@ -69,12 +70,17 @@ func main() {
 
 	getUserRouter := router.Methods(http.MethodGet).Subrouter()
 	getUserRouter.HandleFunc("/user/{username}", userHandler.GetRegularUser)
+	getUserRouter.Use(userHandler.Authenticate)
 
 	getBusinessUserRouter := router.Methods(http.MethodGet).Subrouter()
 	getBusinessUserRouter.HandleFunc("/business/user/{username}", userHandler.GetBusinessUser)
+	getBusinessUserRouter.Use(userHandler.Authenticate)
 
 	getRouter := router.Methods(http.MethodGet).Subrouter()
 	getRouter.HandleFunc("/", userHandler.GetAllRegularUsers)
+
+	getUsernames := router.Methods(http.MethodGet).Subrouter()
+	getUsernames.HandleFunc("/allUsernames", userHandler.GetAllUsernames)
 
 	getBusinessRouter := router.Methods(http.MethodGet).Subrouter()
 	getBusinessRouter.HandleFunc("/business", userHandler.GetAllBusinessUsers)
@@ -84,9 +90,6 @@ func main() {
 
 	sendMail := router.Methods(http.MethodPost).Subrouter()
 	sendMail.HandleFunc("/sendEmail/{username}", userHandler.SendMail)
-
-	// ZA PROVERU PRISTUPA RUTA NA OSNOVU TOKENA
-	//middlewares.Authenticate(userHandler.SignIn)
 
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
 		gorillaHandlers.AllowedHeaders([]string{"Origin, Content-Type, X-Auth-Token"}),

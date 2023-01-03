@@ -224,6 +224,29 @@ func (pr *ProfileRepo) GetAll() (model.RegularProfiles, error) {
 	return users, nil
 }
 
+func (pr *ProfileRepo) GetAllUsername() ([]*string, error) {
+	// Initialise context (after 5 seconds timeout, abort operation)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	usersCollection := pr.getCollection()
+	//db.collection.find({}, { user_name : 1})
+
+	var users []*string
+	usersCursor, err := usersCollection.Find(ctx, bson.M{"username": 1})
+	pr.logger.Println("1 USERS : ", usersCursor)
+	if err != nil {
+		pr.logger.Println(err)
+		return nil, err
+	}
+	if err = usersCursor.All(ctx, &users); err != nil {
+		pr.logger.Println(err)
+		return nil, err
+	}
+	pr.logger.Println("2 USERS : ", users)
+	return users, nil
+}
+
 func (pr *ProfileRepo) GetAllBusiness() (model.BusinessProfiles, error) {
 	// Initialise context (after 5 seconds timeout, abort operation)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

@@ -3,13 +3,13 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"strings"
-	"time"
 	"tweet_service/data"
+	"tweet_service/middlewares"
+	"unicode"
 )
 
 type KeyTweet struct{}
@@ -143,30 +143,32 @@ func (s *TweetsHandler) GetCountByLikes(rw http.ResponseWriter, h *http.Request)
 	}
 }
 
-func httpClient() *http.Client {
-	client := &http.Client{Timeout: 10 * time.Second}
-	return client
+//func httpClient() *http.Client {
+//	client := &http.Client{Timeout: 10 * time.Second}
+//	return client
+//}
+
+func IsValidString(s string) bool {
+
+	for _, char := range s {
+
+		if (unicode.IsLetter(char) == true) && (strings.ContainsAny(s, "<>*()/[]") == false) && (strings.Contains(s, "SELECT") == false) && (strings.Contains(s, "FROM") == false) && (strings.Contains(s, "WHERE") == false) && (strings.Contains(s, " ") == false) {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *TweetsHandler) CraeteTweetForRegUser(rw http.ResponseWriter, h *http.Request) {
 
-	//token, er := ExtractToken(h)
-	//s.logger.Println("TOKEN : ", token)
-	//s.logger.Println("Erorr : ", er)
-	//if er != nil {
-	//	http.Error(rw, er.Error(), http.StatusForbidden)
-	//	return
-	//}
-	//
-	//c := httpClient()
-	//responseErr := auth.VerifyToken(c, http.MethodPost, token)
-	//if responseErr != nil {
-	//	http.Error(rw, er.Error(), http.StatusForbidden)
-	//	return
-	//}
-	//s.logger.Println("RESPONSE : ", responseErr)
-
 	userTweet := h.Context().Value(KeyTweet{}).(*data.TweetByRegularUser)
+
+	if IsValidString(userTweet.Description) == false {
+		s.logger.Fatal(" description is in unsafe format !")
+		data.WriteAsJson(rw, http.StatusBadRequest, "This description is unsafe !")
+		return
+	}
+
 	err := s.repo.InsertTweetByRegUser(userTweet)
 	if err != nil {
 		s.logger.Print("Database exception: ", err)
@@ -231,15 +233,38 @@ func (s *TweetsHandler) MiddlewareContentTypeSet(next http.Handler) http.Handler
 	})
 }
 
-func ExtractToken(r *http.Request) (string, error) {
-	// Authorization => Bearer Token...
-	header := strings.TrimSpace(r.Header.Get("Authorization"))
-	log.Println("HEADER ", header)
-	splitted := strings.Split(header, " ")
-	log.Println("SPLITTED ", header)
-	if len(splitted) != 2 {
-		log.Println("error on extract token from header:", header)
-		return "", errors.New("invalid jwt")
-	}
-	return splitted[1], nil
+func (s *TweetsHandler) Authenticate(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tokenString, err := middlewares.ExtractToken(r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		token, err := middlewares.ParseToken(tokenString)
+		if err != nil {
+			log.Println("error on parse token:", err.Error())
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		if !token.Valid {
+			log.Println("invalid token", tokenString)
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+
+		tokenPayload, err := middlewares.NewTokenPayload(tokenString)
+		if err != nil {
+			log.Println("cant generate token payload :", err.Error())
+			http.Error(w, "Unautorized", http.StatusUnauthorized)
+			return
+		}
+
+		if !(tokenPayload.Role == "regular" || tokenPayload.Role == "business") {
+			log.Println("permission error ", tokenPayload.Role)
+			http.Error(w, "Unautorized", http.StatusUnauthorized)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }

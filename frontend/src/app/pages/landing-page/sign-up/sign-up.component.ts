@@ -26,10 +26,13 @@ export class SignUpComponent implements OnInit {
       placeOfLiving: new FormControl("",Validators.required),
       email: new FormControl("", [Validators.required, Validators.email]),
       username: new FormControl("", {
-        validators: [Validators.required],
+        validators: [Validators.required,Validators.min(5)],
         updateOn: "blur"
       }), 
-      password: new FormControl("", [Validators.required, Validators.min(8)])
+      password: new FormControl("", [Validators.required, Validators.min(8), 
+        Validators.pattern(
+          '^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)[A-Za-z\\d!$%@#£€*?&]{8,}$'
+        )])
     });
 
     this.payload = {

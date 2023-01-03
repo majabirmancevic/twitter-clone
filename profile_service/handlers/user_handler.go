@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"net/http"
+	"profile_service/middlewares"
 	"profile_service/model"
 	"profile_service/repository"
 	"profile_service/security"
@@ -423,6 +424,24 @@ func (p *ProfileHandler) GetAllRegularUsers(rw http.ResponseWriter, h *http.Requ
 	}
 }
 
+func (p *ProfileHandler) GetAllUsernames(rw http.ResponseWriter, h *http.Request) {
+	users, err := p.repo.GetAllUsername()
+	if err != nil {
+		p.logger.Print("Database exception: ", err)
+	}
+
+	if users == nil {
+		return
+	}
+
+	err = model.ToJSON(rw)
+	if err != nil {
+		http.Error(rw, "Unable to convert to json", http.StatusInternalServerError)
+		p.logger.Fatal("Unable to convert to json :", err)
+		return
+	}
+}
+
 func (p *ProfileHandler) GetAllBusinessUsers(rw http.ResponseWriter, h *http.Request) {
 	users, err := p.repo.GetAllBusiness()
 	if err != nil {
@@ -523,16 +542,44 @@ func (p *ProfileHandler) MiddlewareContentTypeSet(next http.Handler) http.Handle
 		p.logger.Println("Method [", h.Method, "] - Hit path :", h.URL.Path)
 
 		rw.Header().Add("Content-Type", "application/json")
-		//rw.Header().Add("Access-Control-Allow-Headers", "Content-Type,Origin,Content-Type, Accept, Authorization")
-		//rw.Header().Add("Access-Control-Allow-Origin", "*")
-
-		//if h.Method == "OPTIONS" {
-		//	rw.Header().Add("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH")
-		//	rw.WriteHeader(http.StatusOK)
-		//}
-		//rw.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 		next.ServeHTTP(rw, h)
 
+	})
+}
+
+func (p *ProfileHandler) Authenticate(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tokenString, err := middlewares.ExtractToken(r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		token, err := middlewares.ParseToken(tokenString)
+		if err != nil {
+			log.Println("error on parse token:", err.Error())
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		if !token.Valid {
+			log.Println("invalid token", tokenString)
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+
+		tokenPayload, err := security.NewTokenPayload(tokenString)
+		if err != nil {
+			log.Println("cant generate token payload :", err.Error())
+			security.WriteError(w, http.StatusUnauthorized, security.ErrUnauthorized)
+			return
+		}
+
+		if !(tokenPayload.Role == "regular" || tokenPayload.Role == "business") {
+			log.Println("permission error ", tokenPayload.Role)
+			security.WriteError(w, http.StatusUnauthorized, security.ErrUnauthorized)
+			return
+		}
+
+		next.ServeHTTP(w, r)
 	})
 }

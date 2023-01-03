@@ -68,7 +68,7 @@ func (p *AuthHandler) SignIn(rw http.ResponseWriter, h *http.Request) {
 	}
 
 	log.Println("--------Kreiranje tokena-------- ")
-	token, err := security.NewToken(user.Username)
+	token, err := security.NewToken(user.Username, user.Role)
 	log.Println("--------NewToken ERROR : ", err)
 	if err != nil {
 		log.Println("Token cannot be created", err.Error())
@@ -137,6 +137,19 @@ func (p *AuthHandler) Authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 	if !token.Valid {
 		log.Println("invalid token", tokenStr)
+		security.WriteError(w, http.StatusUnauthorized, security.ErrUnauthorized)
+		return
+	}
+
+	tokenPayload, err := security.NewTokenPayload(tokenStr)
+	if err != nil {
+		log.Println("cant generate token payload :", err.Error())
+		security.WriteError(w, http.StatusUnauthorized, security.ErrUnauthorized)
+		return
+	}
+
+	if tokenPayload.Role != "regular" || tokenPayload.Role != "business" {
+		log.Println("permission error ", tokenPayload.Role)
 		security.WriteError(w, http.StatusUnauthorized, security.ErrUnauthorized)
 		return
 	}

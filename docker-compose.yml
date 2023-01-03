@@ -52,7 +52,7 @@ services:
       # protocol://username:password@hostname:port
       #- MONGO_DB_URI=mongodb://root:pass@mongo:27017
       MONGO_DB_URI: mongodb://mongo:27017
-    # JWT_SECRET_KEY: c5VjcmV0
+      JWT_SECRET_KEY: c5VjcmV0
 
     depends_on:
       - mongo
@@ -72,7 +72,7 @@ services:
       TWEET_PORT: 8003
       # NoSQL: environment variable holding connection URI for Cassandra database
       CASS_DB: cassandra:9042
-    # JWT_SECRET_KEY: c5VjcmV0
+      JWT_SECRET_KEY: c5VjcmV0
 
     depends_on:
       cassandra:

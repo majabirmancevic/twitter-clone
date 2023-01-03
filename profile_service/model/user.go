@@ -149,3 +149,11 @@ func (p *SignInRequest) FromJSON(r io.Reader) error {
 	d := json.NewDecoder(r)
 	return d.Decode(p)
 }
+
+//------------------------------------------------------------
+
+func ToJSON(w io.Writer) error {
+	var users []string
+	e := json.NewEncoder(w)
+	return e.Encode(users)
+}
