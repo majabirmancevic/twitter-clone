@@ -33,6 +33,8 @@ import { AuthService } from './services/auth.service';
 import { UserService } from './services/user.service';
 import { PostService } from './services/post.service';
 import { LikeListComponent } from './like-list/like-list.component';
+import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
+import { InfoMessageComponent } from './info-message/info-message.component';
 
 
 
@@ -55,7 +57,9 @@ import { LikeListComponent } from './like-list/like-list.component';
 
     SignUpBusinessComponent,
       ChangePasswordComponent,
-      LikeListComponent
+      LikeListComponent,
+      ResetPasswordComponent,
+      InfoMessageComponent
 
   ],
 

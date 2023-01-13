@@ -1,4 +1,4 @@
-package security
+package middlewares
 
 import (
 	"errors"
@@ -12,20 +12,8 @@ import (
 )
 
 var (
-	ErrInvalidToken = errors.New("invalid jwt")
-	jwtSecretKey    = []byte(os.Getenv("JWT_SECRET_KEY"))
+	jwtSecretKey = []byte(os.Getenv("JWT_SECRET_KEY"))
 )
-
-func NewToken(username string, role string) (string, error) {
-	claims := &jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(time.Minute * 60).Unix(),
-		Issuer:    username,
-		IssuedAt:  time.Now().Unix(),
-		Audience:  role,
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtSecretKey)
-}
 
 func ExtractToken(r *http.Request) (string, error) {
 	// Authorization => Bearer Token...
@@ -33,7 +21,7 @@ func ExtractToken(r *http.Request) (string, error) {
 	splitted := strings.Split(header, " ")
 	if len(splitted) != 2 {
 		log.Println("error on extract token from header:", header)
-		return "", ErrInvalidToken
+		return "", errors.New("invalid jwt")
 	}
 	return splitted[1], nil
 }
@@ -63,7 +51,7 @@ func NewTokenPayload(tokenString string) (*TokenPayload, error) {
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !token.Valid || !ok {
-		return nil, ErrInvalidToken
+		return nil, errors.New("invalid jwt")
 	}
 	username, _ := claims["iss"].(string)
 	role, _ := claims["aud"].(string)

@@ -46,13 +46,12 @@
             <label>Username</label>
             <div>
                 <span *ngIf="username.errors?.['required'] && form.get('username')?.touched" style="color:red ;">Please enter a username</span>
-                <span *ngIf="username.errors?.['usernameExists']" style="color:red ;">This username has been taken</span>
                 <input  [formControlName]="'username'" type="text">
             </div> 
              
             <label>Password</label>
             <div>
-                <span *ngIf="!form.get('password')?.valid && form.get('password')?.touched" style="color:red ;">Password cannot be empty</span>
+                <span *ngIf="!form.get('password')?.valid && form.get('password')?.touched" style="color:red ;">The password must contain a minimum of 8 characters, one capital letter and a number!</span>
                 <input  [formControlName]="'password'" type="password">
             </div>
             

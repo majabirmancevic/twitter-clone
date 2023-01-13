@@ -18,6 +18,8 @@
                 <span *ngIf="!form.get('password')?.valid && form.get('password')?.touched" style="color:red ;">Password cannot be empty</span>
                 <input  [formControlName]="'password'" type="password">
             </div> 
+
+            <div> <span (click)="goTo()"> Forgot your password ? </span></div>
             
             <input [disabled]="!form.valid" type="submit" value="Sign in">
         </form>

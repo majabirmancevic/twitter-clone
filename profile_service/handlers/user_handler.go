@@ -2,12 +2,15 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/thanhpk/randstr"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"net/http"
+	"profile_service/middlewares"
 	"profile_service/model"
 	"profile_service/repository"
 	"profile_service/security"
@@ -176,9 +179,11 @@ func (p *ProfileHandler) VerifyEmail(rw http.ResponseWriter, h *http.Request) {
 	code := vars["code"]
 	verificationCode := security.Encode(code)
 
-	log.Println("CODE ", code)
-	log.Println("Verification code ", verificationCode)
-	//var updatedUser model.RegularProfile
+	var email string
+	err := json.NewDecoder(h.Body).Decode(&email)
+
+	log.Println("Email ", email)
+
 	updatedUser, err := p.repo.GetByVerificationCode(verificationCode)
 
 	log.Println("UPDATED USER ", updatedUser)
@@ -245,6 +250,52 @@ func (p *ProfileHandler) VerifyBusinessEmail(rw http.ResponseWriter, h *http.Req
 
 //-------------------------------------------------------------------------------------------
 
+func (p *ProfileHandler) SendMail(rw http.ResponseWriter, h *http.Request) {
+
+	vars := mux.Vars(h)
+	username := vars["username"]
+
+	var email string
+	err := json.NewDecoder(h.Body).Decode(&email)
+
+	log.Println("Email ", email)
+	user, err := p.repo.GetByUsername(username)
+	log.Println(" USER ", user.Username)
+
+	if err != nil {
+		log.Println(err.Error())
+		response := errors.New("Invalid username or user doesn't exists")
+		security.WriteAsJson(rw, http.StatusBadRequest, response)
+		return
+	}
+
+	if !user.Verified {
+		log.Println("User is not verified")
+		log.Println(err.Error())
+		response := errors.New("User is not verified")
+		security.WriteAsJson(rw, http.StatusForbidden, response)
+		return
+	}
+	code := randstr.String(20)
+	emailCode := security.Encode(code)
+	client := "https://localhost:4200/reset-password/" + username + "/" + emailCode
+
+	// 👇 Send Email
+	emailData := security.EmailData{
+		URL:       fmt.Sprintf("Press this link for reset your password : %v", client),
+		FirstName: user.Username,
+		Subject:   "Reset password",
+	}
+
+	p.logger.Println("------- slanje mejla ", emailData)
+	security.SendEmail(user, &emailData)
+
+	rw.WriteHeader(http.StatusOK)
+
+}
+
+//-------------------------------------------------------------------------------------------
+
 func (p *ProfileHandler) PasswordChange(rw http.ResponseWriter, h *http.Request) {
 	vars := mux.Vars(h)
 	username := vars["username"]
@@ -258,6 +309,57 @@ func (p *ProfileHandler) PasswordChange(rw http.ResponseWriter, h *http.Request)
 	error := security.VerifyPassword(user.Password, passwordDto.OldPassword)
 	if error != nil {
 		http.Error(rw, "old password and new password don't match", http.StatusBadRequest)
+	}
+
+	if !security.IsValid(passwordDto.NewPassword) {
+		p.logger.Fatal("This password is not in valid format  !")
+		security.WriteAsJson(rw, http.StatusBadRequest, "This password is not in valid format!")
+		return
+	}
+
+	if security.CheckBlacklistedPassword(passwordDto.NewPassword) {
+		p.logger.Fatal("This password is unsafe  !")
+		security.WriteAsJson(rw, http.StatusBadRequest, "This password is unsafe !")
+		return
+	}
+
+	newPassword, er := security.EncryptPassword(passwordDto.NewPassword)
+	if er != nil {
+		http.Error(rw, "cant encrypt password", http.StatusBadRequest)
+	}
+
+	user.Password = newPassword
+	p.repo.UpdatePassword(user)
+	rw.WriteHeader(http.StatusOK)
+}
+
+//-------------------------------------------------------------------------------------------
+
+func (p *ProfileHandler) ResetPassword(rw http.ResponseWriter, h *http.Request) {
+	vars := mux.Vars(h)
+	username := vars["username"]
+
+	user, err := p.repo.GetByUsername(username)
+	if err != nil {
+		http.Error(rw, "user does not exist", http.StatusBadRequest)
+	}
+
+	passwordDto := h.Context().Value(Password{}).(*model.ResetPassword)
+	error := security.VerifyPassword(passwordDto.NewPassword, passwordDto.RepeatNewPassword)
+	if error != nil {
+		http.Error(rw, "the password must be the same in both input fields", http.StatusBadRequest)
+	}
+
+	if !security.IsValid(passwordDto.NewPassword) {
+		p.logger.Fatal("This password is not in valid format  !")
+		security.WriteAsJson(rw, http.StatusBadRequest, "This password is not in valid format!")
+		return
+	}
+
+	if security.CheckBlacklistedPassword(passwordDto.NewPassword) {
+		p.logger.Fatal("This password is unsafe  !")
+		security.WriteAsJson(rw, http.StatusBadRequest, "This password is unsafe !")
+		return
 	}
 
 	newPassword, er := security.EncryptPassword(passwordDto.NewPassword)
@@ -315,6 +417,24 @@ func (p *ProfileHandler) GetAllRegularUsers(rw http.ResponseWriter, h *http.Requ
 	}
 
 	err = users.ToJSON(rw)
+	if err != nil {
+		http.Error(rw, "Unable to convert to json", http.StatusInternalServerError)
+		p.logger.Fatal("Unable to convert to json :", err)
+		return
+	}
+}
+
+func (p *ProfileHandler) GetAllUsernames(rw http.ResponseWriter, h *http.Request) {
+	users, err := p.repo.GetAllUsername()
+	if err != nil {
+		p.logger.Print("Database exception: ", err)
+	}
+
+	if users == nil {
+		return
+	}
+
+	err = model.ToJSON(rw)
 	if err != nil {
 		http.Error(rw, "Unable to convert to json", http.StatusInternalServerError)
 		p.logger.Fatal("Unable to convert to json :", err)
@@ -400,21 +520,66 @@ func (p *ProfileHandler) MiddlewarePasswordDeserialization(next http.Handler) ht
 	})
 }
 
+func (p *ProfileHandler) MiddlewareResetPasswordDeserialization(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, h *http.Request) {
+		passwordDTo := &model.ResetPassword{}
+		err := passwordDTo.FromJSON(h.Body)
+		if err != nil {
+			http.Error(rw, "Unable to decode json", http.StatusBadRequest)
+			p.logger.Fatal(err)
+			return
+		}
+
+		ctx := context.WithValue(h.Context(), Password{}, passwordDTo)
+		h = h.WithContext(ctx)
+
+		next.ServeHTTP(rw, h)
+	})
+}
+
 func (p *ProfileHandler) MiddlewareContentTypeSet(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, h *http.Request) {
 		p.logger.Println("Method [", h.Method, "] - Hit path :", h.URL.Path)
 
 		rw.Header().Add("Content-Type", "application/json")
-		//rw.Header().Add("Access-Control-Allow-Headers", "Content-Type,Origin,Content-Type, Accept, Authorization")
-		//rw.Header().Add("Access-Control-Allow-Origin", "*")
-
-		//if h.Method == "OPTIONS" {
-		//	rw.Header().Add("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH")
-		//	rw.WriteHeader(http.StatusOK)
-		//}
-		//rw.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 		next.ServeHTTP(rw, h)
 
+	})
+}
+
+func (p *ProfileHandler) Authenticate(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tokenString, err := middlewares.ExtractToken(r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		token, err := middlewares.ParseToken(tokenString)
+		if err != nil {
+			log.Println("error on parse token:", err.Error())
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		if !token.Valid {
+			log.Println("invalid token", tokenString)
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+
+		tokenPayload, err := security.NewTokenPayload(tokenString)
+		if err != nil {
+			log.Println("cant generate token payload :", err.Error())
+			security.WriteError(w, http.StatusUnauthorized, security.ErrUnauthorized)
+			return
+		}
+
+		if !(tokenPayload.Role == "regular" || tokenPayload.Role == "business") {
+			log.Println("permission error ", tokenPayload.Role)
+			security.WriteError(w, http.StatusUnauthorized, security.ErrUnauthorized)
+			return
+		}
+
+		next.ServeHTTP(w, r)
 	})
 }

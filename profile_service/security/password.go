@@ -40,8 +40,6 @@ func IsValid(s string) bool {
 			hasLower = true
 		case unicode.IsNumber(char):
 			hasNumber = true
-			//case strings.ContainsAny(s, "<>*()/") == false:
-			//	hasSpecial = true
 		}
 	}
 
@@ -53,8 +51,6 @@ func IsValid(s string) bool {
 		log.Println("REZULTAT POSLE JE ", result)
 	}
 	return result
-	//hasMinLen && hasUpper && hasLower && hasNumber && strings.ContainsAny(s, "<>*()/^#$%&") == true
-	//&& hasSpecial
 }
 
 func Valid(email string) bool {
@@ -66,7 +62,7 @@ func IsValidString(s string) bool {
 
 	for _, char := range s {
 
-		if (unicode.IsLetter(char) == true) && (strings.ContainsAny(s, "<>*()/") == false) {
+		if (unicode.IsLetter(char) == true) && (strings.ContainsAny(s, "<>*()/[]") == false) && (strings.Contains(s, "SELECT") == false) && (strings.Contains(s, "FROM") == false) && (strings.Contains(s, "WHERE") == false) && (strings.Contains(s, " ") == false) {
 			return true
 		}
 	}
@@ -81,15 +77,6 @@ func VerifyBusinessInputs(companyName string, email string, webSite string, user
 }
 
 func VerifyInputs(name string, lastaname string, placeOfLiving string, username string, password string, email string, gender string, age int32) bool {
-	//log.Println("NAME ", IsValidString(name))
-	//log.Println("LASTNAME ", IsValidString(lastaname))
-	//log.Println("PLACE OF LIVING ", IsValidString(placeOfLiving))
-	//log.Println("USERNAME ", IsValidString(username))
-	//log.Println("PASSWORD ", IsValid(password))
-	//log.Println("EMAIL ", Valid(email))
-	//log.Println("GENDER ", IsValidString(gender))
-	//log.Println("GENDER M/F ", strings.Contains(gender, "M") || strings.Contains(gender, "F"))
-	//log.Println("AGE ", age >= 13)
 
 	if IsValidString(name) && IsValidString(lastaname) && IsValidString(placeOfLiving) && IsValidString(username) && IsValid(password) && Valid(email) && (IsValidString(gender) && (strings.Contains(gender, "M") || strings.Contains(gender, "F"))) && (age >= 13) {
 		return true

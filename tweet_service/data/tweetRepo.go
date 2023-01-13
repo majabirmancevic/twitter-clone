@@ -1,10 +1,12 @@
 package data
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gocql/gocql"
 	uuid "github.com/satori/go.uuid"
 	"log"
+	"net/http"
 	"os"
 )
 
@@ -182,4 +184,12 @@ func (tr *TweetRepo) GetDistinctIds(idColumnName string, tableName string, tweet
 		return nil, err
 	}
 	return ids, nil
+}
+
+func WriteAsJson(w http.ResponseWriter, statusCode int, data interface{}) {
+	//w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(data)
 }

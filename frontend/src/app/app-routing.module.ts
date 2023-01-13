@@ -14,6 +14,8 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {FormsModule} from '@angular/forms';
 import { ChangePasswordComponent } from './pages/change-password/change-password.component';
 import { BusinessProfilePageComponent } from './pages/business-profile-page/business-profile-page.component';
+import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
+import { InfoMessageComponent } from './info-message/info-message.component';
 
 
 
@@ -31,7 +33,11 @@ const routes: Routes = [
   {path : "profile-business/:username" , component:BusinessProfilePageComponent, canActivate: [AuthGuard]},
   {path : "profile/likes" , component: ProfilePageComponent, canActivate: [AuthGuard]},
   {path : "profile/update" , component: ProfilePageComponent, canActivate: [AuthGuard]},
-  {path : "change-password/:username", component : ChangePasswordComponent, canActivate: [AuthGuard]}
+  {path : "change-password/:username", component : ChangePasswordComponent, canActivate: [AuthGuard]},
+  {path : "reset-password/:username/:code", component : ResetPasswordComponent},
+  {path : "info", component : InfoMessageComponent}
+
+
 
 ];
 

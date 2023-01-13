@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	gorillaHandlers "github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
@@ -9,9 +11,6 @@ import (
 	"time"
 	"tweet_service/data"
 	"tweet_service/handlers"
-
-	gorillaHandlers "github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -39,7 +38,6 @@ func main() {
 
 	store.CreateTables()
 
-	//authClient := auth.NewClient()
 	//Initialize the handler and inject said logger
 	tweetsHandler := handlers.NewTweetsHandler(logger, store)
 
@@ -49,16 +47,20 @@ func main() {
 
 	getTweetIds := router.Methods(http.MethodGet).Subrouter()
 	getTweetIds.HandleFunc("/tweets/users/{tweetId}", tweetsHandler.GetAllRegularUserIds)
+	getTweetIds.Use(tweetsHandler.Authenticate)
 
 	getTweetByRegUser := router.Methods(http.MethodGet).Subrouter()
 	getTweetByRegUser.HandleFunc("/tweets/{username}", tweetsHandler.GetTweetsByRegUser)
-
+	getTweetByRegUser.Use(tweetsHandler.Authenticate)
+	
 	postTweetForRegUser := router.Methods(http.MethodPost).Subrouter()
 	postTweetForRegUser.HandleFunc("/tweets", tweetsHandler.CraeteTweetForRegUser)
+	postTweetForRegUser.Use(tweetsHandler.Authenticate)
 	postTweetForRegUser.Use(tweetsHandler.MiddlewareTweetForRegUserDeserialization)
 
 	likeTweetForRegUser := router.Methods(http.MethodPost).Subrouter()
 	likeTweetForRegUser.HandleFunc("/like/{id}", tweetsHandler.LikeTweet)
+	likeTweetForRegUser.Use(tweetsHandler.Authenticate)
 	likeTweetForRegUser.Use(tweetsHandler.MiddlewareLikeDeserialization)
 
 	getLikesByTweet := router.Methods(http.MethodGet).Subrouter()
