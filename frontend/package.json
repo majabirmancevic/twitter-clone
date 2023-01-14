@@ -24,7 +24,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "bootstrap": "^5.2.3",
     "ng-recaptcha": "^9.0.0",
-    "ngx-image-cropper": "^6.2.1",
+    "ngx-image-cropper": "^6.3.2",
     "ngx-toastr": "^15.0.0",
     "ngx-webstorage": "^10.0.1",
     "rxjs": "~7.5.0",
