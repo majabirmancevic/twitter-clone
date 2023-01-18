@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule} from '@angular/forms';
-import {ReactiveFormsModule} from '@angular/forms';
+import {ReactiveFormsModule,FormsModule} from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -31,7 +30,6 @@ import { BusinessProfilePageComponent } from './pages/business-profile-page/busi
 import { ChangePasswordComponent } from './pages/change-password/change-password.component';
 import { AuthService } from './services/auth.service';
 import { UserService } from './services/user.service';
-import { PostService } from './services/post.service';
 import { LikeListComponent } from './like-list/like-list.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 import { InfoMessageComponent } from './info-message/info-message.component';

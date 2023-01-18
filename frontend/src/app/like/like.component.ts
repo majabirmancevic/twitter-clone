@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component,  Input, OnInit, } from '@angular/core';
 import { Router } from '@angular/router';
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faHeart as faSolidHeart } from '@fortawesome/free-solid-svg-icons';
@@ -21,10 +21,10 @@ export class LikeComponent extends SingleAction implements OnInit {
  
   display = false;
   @Input() override tweet! : PostResponse;
-  //@Input() 
+ 
   likes : Array<string> = [];
 
-  //@Output() viewLike = new EventEmitter<string>();
+ 
   
   constructor(private likeService: LikeService, private router: Router, private authService:AuthService,private postService: PostService) { 
     super();
@@ -34,7 +34,7 @@ export class LikeComponent extends SingleAction implements OnInit {
   }
 
   ngOnInit(): void {
-    //this.likeService.isLiked(this.tweet.id).subscribe(response => this.isActive = response);
+  
     this.likeService.getLikeCounter(this.tweet.id).subscribe(counter => {this.likeCounter = counter});
     this.viewLike()
   }

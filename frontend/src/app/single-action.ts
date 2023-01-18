@@ -1,5 +1,4 @@
-import { Component, Input } from "@angular/core";
-import { PostResponse } from "./payloads/response/post";
+import { Component } from "@angular/core";
 import { TweetInput } from "./tweet-input";
 
 

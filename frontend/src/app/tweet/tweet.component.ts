@@ -1,8 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { PostResponse } from '../payloads/response/post';
-import { PostService } from '../services/post.service';
-import { TweetInput } from '../tweet-input';
+
 
 @Component({
   selector: 'app-tweet',
@@ -11,8 +9,8 @@ import { TweetInput } from '../tweet-input';
 })
 export class TweetComponent  implements OnInit {
 
-  @Input() footer: Boolean = true;
-  @Input() counters: Boolean = false;
+  @Input() footer: boolean = true;
+  @Input() counters: boolean = false;
   @Input() tweet!: PostResponse ;
 
 
@@ -28,10 +26,6 @@ export class TweetComponent  implements OnInit {
   }
 
   
-  
-  // goToTweet(tweetId: number){
-    
-  //   this.router.navigate(["/tweet/" + tweetId], {state: {data: this.tweet}});
-  // }
+
 
 }

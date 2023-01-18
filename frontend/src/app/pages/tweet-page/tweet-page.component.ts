@@ -12,12 +12,12 @@ import { PostService } from 'src/app/services/post.service';
 export class TweetPageComponent extends OverlayForm implements OnInit {
 
   replies: Array<PostResponse>;
-  isFocus: Boolean = false;
+  isFocus: boolean = false;
   navigationSubscription;
 
   constructor(private router: Router, private postService: PostService) { 
     super();
-    //https://medium.com/ableneo/how-to-pass-data-between-routed-components-in-angular-2306308d8255
+    
     this.tweet = history.state.data;
     console.log(history.state.data);
     this.replies = new Array();
@@ -36,7 +36,7 @@ export class TweetPageComponent extends OverlayForm implements OnInit {
   }
 
   ngOnInit(): void {
-    //this.postService.getRepliesForTweet(this.tweet.id).subscribe(response => this.replies = response);
+    
   }
 
   ngOnDestroy() {
@@ -50,13 +50,6 @@ export class TweetPageComponent extends OverlayForm implements OnInit {
   }
 
   reply(){
-
-    // this.payload = {
-    //   text: this.form.get("text")?.value,
-    //   tweetId: this.tweet.id,
-    //   type: "REPLY"
-    // }
-
     const self = this;
     this.postService.tweet(this.payload).subscribe({
       complete(){

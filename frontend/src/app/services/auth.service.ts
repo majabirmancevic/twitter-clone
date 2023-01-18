@@ -2,8 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { LocalStorageService } from 'ngx-webstorage';
-import { map, tap, Observable } from 'rxjs';
-import { ResetPasswordComponent } from '../pages/reset-password/reset-password.component';
+import { map } from 'rxjs';
 import { ResetPasswordPayload } from '../payloads/request/reset-password';
 import { SignInRequestPayload } from '../payloads/request/sign-in';
 import { SignUpPayload } from '../payloads/request/sign-up';
@@ -26,7 +25,7 @@ export class AuthService {
       'Content-Type': 'application/json',
 
     }); 
-    const options = { headers: headers };
+
        
     return this.http.post("https://localhost:8002/", JSON.stringify(payload), { headers: headers });
   }
@@ -39,7 +38,7 @@ export class AuthService {
       'Content-Type': 'application/json',
 
     }); 
-    const options = { headers: headers };
+ 
        
     return this.http.post("https://localhost:8002/business", JSON.stringify(payload), { headers: headers });
   }
@@ -51,7 +50,7 @@ export class AuthService {
       'Content-Type': 'application/json',
     }); 
     const options = { headers: headers };
-    const self = this;
+    
 
     return this.http.post<SignInResponsePayload>("https://localhost:8001/login", JSON.stringify(payload), options).pipe<SignInResponsePayload>(
       map(response=>{
@@ -119,29 +118,28 @@ export class AuthService {
   
   logout() {
       this.router.navigateByUrl("");   
-      //this.router.navigate(['']);
       localStorage.clear()
 
   }
 
-  private parseToken(){
-    let jwt = localStorage.getItem('token');
-    if(jwt !== null){
-      let jwtData = jwt.split('.')[1];
-      let decodedJwtJsonData = atob(jwtData);
-      let decodedJwtData = JSON.parse(decodedJwtJsonData);
-      return decodedJwtData
-    }
-  }
+  // private parseToken(){
+  //   let jwt = localStorage.getItem('token');
+  //   if(jwt !== null){
+  //     let jwtData = jwt.split('.')[1];
+  //     let decodedJwtJsonData = atob(jwtData);
+  //     let decodedJwtData = JSON.parse(decodedJwtJsonData);
+  //     return decodedJwtData
+  //   }
+  // }
 
-  getUsernameFromToken(): string{
-    let token = this.parseToken();
+  // getUsernameFromToken(): string{
+  //   let token = this.parseToken();
 
-    if(token) {
-      return this.parseToken()['sub']
-    }
-    return "";
-  }
+  //   if(token) {
+  //     return this.parseToken()['sub']
+  //   }
+  //   return "";
+  // }
 
  
   // findAllUsernames(): Observable<String[]> {
