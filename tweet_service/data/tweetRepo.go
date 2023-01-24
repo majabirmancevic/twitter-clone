@@ -165,9 +165,6 @@ func (tr *TweetRepo) InsertLikeByRegUser(username string, id string) error {
 	return nil
 }
 
-// NoSQL: Performance issue, we never want to fetch all the data
-// (In order to get all student ids we need to contact every partition which are usually located on different servers!)
-// Here we are doing it for demonstration purposes (so we can see all student/predmet ids)
 func (tr *TweetRepo) GetDistinctIds(idColumnName string, tableName string, tweetId string) ([]string, error) {
 	scanner := tr.session.Query(
 		fmt.Sprintf(`SELECT %s FROM %s WHERE tweet_id = '%s'`, idColumnName, tableName, tweetId)).
