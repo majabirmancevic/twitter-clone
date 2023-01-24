@@ -1,7 +1,6 @@
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from "@angular/common/http";
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent} from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable, catchError, throwError, switchMap, filter, take } from "rxjs";
-import { SignInResponsePayload } from "../payloads/response/sign-in";
+import { Observable} from "rxjs";
 import { AuthService } from "./auth.service";
 
 @Injectable({

@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute,  Router } from '@angular/router';
 import { OverlayForm } from 'src/app/overlay-form';
 import { PostResponse } from 'src/app/payloads/response/post';
 import { AuthService } from 'src/app/services/auth.service';
 import { PostService } from 'src/app/services/post.service';
 import { UserService } from 'src/app/services/user.service';
 import { RegularUser } from 'src/app/user-model';
-import { ImageCroppedEvent, base64ToFile } from 'ngx-image-cropper';
-import { BusinessUser } from 'src/app/user-model-business';
+
 
 @Component({
   selector: 'app-profile-page',

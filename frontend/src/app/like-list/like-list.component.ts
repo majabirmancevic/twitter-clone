@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -8,15 +8,15 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class LikeListComponent implements OnInit {
 
-  //@Output() setTweetId = new EventEmitter<string | undefined>();
+
   @Input() likes! : string[];
 
-  //tweetId!:string;
+  
 
   constructor(private activatedRoute:ActivatedRoute) { }
 
   ngOnInit(): void {
-    //this.tweetId = this.activatedRoute.snapshot.params['tweetId'];
+   
   }
 
 }

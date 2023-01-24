@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>Sign up</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     </head>
+    
     <body class="container">
         <form [formGroup]="form" (ngSubmit)="signUp()">
             <label>Name</label>
@@ -63,8 +65,6 @@
             <div [hidden]="!captcha">
                 <input  type="submit" value="Sign up">
             </div>
-            
-            <!-- <input  type="submit" value="Sign up"> -->
         </form>
     </body>
 </html>

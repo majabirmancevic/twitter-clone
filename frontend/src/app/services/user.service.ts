@@ -16,7 +16,6 @@ export class UserService {
 
   constructor(private http: HttpClient, private authService: AuthService) {
     this.payload = new FormData;
-    //this.payload.append("username", this.authService.getUsername());
     this.username = this.authService.getUsername()
   }
 

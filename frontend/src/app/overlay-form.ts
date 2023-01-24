@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { Component } from "@angular/core";
 import { FormControl, FormGroup } from "@angular/forms";
 import { PostRequest } from "./payloads/request/post";
 import { TweetInput } from "./tweet-input";

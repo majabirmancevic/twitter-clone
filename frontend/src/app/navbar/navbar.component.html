@@ -2,16 +2,16 @@
     <div class="sidebar-container">
         <div>
             <div>
-                <img src="assets/svg/twitter.svg" class="logo">
+                <img src="assets/svg/twitter.svg" alt="logo" class="logo">
             </div>
             <div class="sidebar-item active" [ngClass]="{'active': getUrl() === '/home'}">
-                <img src="assets/svg/home.svg" class="sidebar-item-icon ">
+                <img src="assets/svg/home.svg" alt="home" class="sidebar-item-icon ">
                 <div [routerLink]="'/home'" class="icon-label">Home</div>
             </div>
             
   
             <div  class="sidebar-item" (click)="navigate()" >     
-                <img src="assets/svg/profile.svg" class="sidebar-item-icon" >
+                <img src="assets/svg/profile.svg" alt="profile" class="sidebar-item-icon" >
                 <div class="icon-label">Profile</div>
             </div>
             <div>

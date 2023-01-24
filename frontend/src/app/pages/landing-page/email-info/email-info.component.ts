@@ -20,7 +20,7 @@ export class EmailInfoComponent implements OnInit {
     this.form = new FormGroup({
       email: new FormControl("", Validators.required),    
       username : new FormControl("", Validators.required)  
-    }),
+    })
 
     this.emailStr = "" 
     this.user = ""

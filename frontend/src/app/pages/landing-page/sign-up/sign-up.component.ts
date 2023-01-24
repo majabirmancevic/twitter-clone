@@ -71,7 +71,7 @@ export class SignUpComponent implements OnInit {
     
     
     self.router.navigate(['/verify-email'], { queryParams: { registered: 'true', verified: 'false' } });
-    //self.toastr.info("Check your email address!");
+    
     this.authService.signUp(this.payload).subscribe({
       next() {},
       complete(){},
@@ -79,7 +79,7 @@ export class SignUpComponent implements OnInit {
         console.log(error);
         console.log("------- GRESKA -------")
         console.log(error.code)
-        //self.toastr.error("Something went wrong!");
+        
       }
     })
   }

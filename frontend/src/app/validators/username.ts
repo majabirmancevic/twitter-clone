@@ -1,6 +1,4 @@
-import { AbstractControl, AsyncValidatorFn, ValidationErrors } from "@angular/forms";
-import { map, Observable } from "rxjs";
-import { AuthService } from "../services/auth.service";
+
 
 
 // export function usernameValidator(authService:AuthService): AsyncValidatorFn{

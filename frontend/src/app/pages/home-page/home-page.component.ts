@@ -40,7 +40,7 @@ export class HomePageComponent implements OnInit {
   
 
     this.username = this.auhtService.getUsername();
-    console.log("USERNAME TOKEN : ",this.auhtService.getUsernameFromToken())
+  
 
     this.newTweetForm = new FormGroup({
       text: new FormControl("", Validators.required)
@@ -61,18 +61,9 @@ export class HomePageComponent implements OnInit {
         this.toastr.success("Sign In Successful");
       }
     })
-    // this.fetchTweets();
+    
   }
 
-  // fetchTweets() {
-  //   const self = this;
-  //   this.postService.getAll().subscribe({
-  //     next(data) {
-  //       self.tweets = data;
-
-  //     }
-  //   })
-  // }
 
   ngOnDestroy() {
     if (this.navigationSubscription) {
@@ -88,7 +79,7 @@ export class HomePageComponent implements OnInit {
       next(response) {
         console.log(response)
         self.newTweetForm.reset();
-        //self.router.navigateByUrl("home");
+        
       },
       complete() { },
       error(error) {
