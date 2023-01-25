@@ -143,11 +143,6 @@ func (s *TweetsHandler) GetCountByLikes(rw http.ResponseWriter, h *http.Request)
 	}
 }
 
-//func httpClient() *http.Client {
-//	client := &http.Client{Timeout: 10 * time.Second}
-//	return client
-//}
-
 func IsValidString(s string) bool {
 
 	for _, char := range s {
