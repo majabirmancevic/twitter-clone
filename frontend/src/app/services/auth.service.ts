@@ -52,7 +52,7 @@ export class AuthService {
     const options = { headers: headers };
     
 
-    return this.http.post<SignInResponsePayload>("https://localhost:8001/login", JSON.stringify(payload), options).pipe<SignInResponsePayload>(
+    return this.http.post<SignInResponsePayload>("https://localhost:8000/auth_service/login", JSON.stringify(payload), options).pipe<SignInResponsePayload>(
       map(response=>{
         localStorage.setItem("token", response.token);
         localStorage.setItem("username", response.username);

@@ -53,6 +53,10 @@ export class BusinessProfilePageComponent extends OverlayForm implements OnInit 
       this.postService.getTweetsByUsername(this.user.username).subscribe(response => this.tweets = response);
     }
 
+    goToChangePass(){
+      this.router.navigate(['/change-password/',this.activateRoute.snapshot.params['username']]);
+    }
+
   ngOnInit(): void {
   }
 

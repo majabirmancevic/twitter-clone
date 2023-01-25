@@ -62,7 +62,7 @@ func IsValidString(s string) bool {
 
 	for _, char := range s {
 
-		if (unicode.IsLetter(char) == true) && (strings.ContainsAny(s, "<>*()/[]") == false) && (strings.Contains(s, "SELECT") == false) && (strings.Contains(s, "FROM") == false) && (strings.Contains(s, "WHERE") == false) && (strings.Contains(s, " ") == false) {
+		if (unicode.IsLetter(char) == true) && (strings.ContainsAny(s, "<>*()/[]") == false) && (strings.Contains(s, "SELECT") == false) && (strings.Contains(s, "FROM") == false) && (strings.Contains(s, "WHERE") == false) {
 			return true
 		}
 	}
