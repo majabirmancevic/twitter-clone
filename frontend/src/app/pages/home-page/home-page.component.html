@@ -22,9 +22,10 @@
 
                     <div class="tweet-form__footer">
                         <div class="tweet-form__footer-icons">
-                        
+                            <span *ngIf="!newTweetForm.get('text')?.valid && newTweetForm.get('text')?.touched" style="color:red ;">Not valid</span>
                         </div>
-                        <input class="tweet-form__footer-button" type="submit" form="newTweetForm" value="Tweet">
+                        
+                        <input [disabled]="!newTweetForm.valid"  class="tweet-form__footer-button" type="submit" form="newTweetForm" value="Tweet">
                     </div>
                 </div>
             </div>

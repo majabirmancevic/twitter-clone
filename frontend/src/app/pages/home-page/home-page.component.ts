@@ -43,7 +43,10 @@ export class HomePageComponent implements OnInit {
   
 
     this.newTweetForm = new FormGroup({
-      text: new FormControl("", Validators.required)
+      text: new FormControl("", [Validators.required, Validators.min(3), 
+        Validators.pattern(
+          '^[A-Za-z\\d!$%@#£€?&]{3,}$'
+        )])
     })
     this.tweets = new Array();
     this.payload = {

@@ -9,7 +9,7 @@
         <form [formGroup]="form" (ngSubmit)="signUpBusiness()">
             <label>Name of the company</label>
             <div>
-                <span *ngIf="!form.get('companyName')?.valid && form.get('companyName')?.touched" style="color:red ;">Please enter your first name</span>
+                <span *ngIf="!form.get('companyName')?.valid && form.get('companyName')?.touched" style="color:red ;">Please enter your company name</span>
                 <input [formControlName]="'companyName'" type="text">
             </div>
 
@@ -21,13 +21,13 @@
 
             <label>Name of the web site</label>
             <div>
-                <span *ngIf="!form.get('webSite')?.valid && form.get('webSite')?.touched" style="color:red ;">Please enter a valid email</span>
+                <span *ngIf="!form.get('webSite')?.valid && form.get('webSite')?.touched" style="color:red ;">Please enter a valid name of web site</span>
                 <input  [formControlName]="'webSite'" type="webSite" required autofocus>
             </div>
             
             <label>Username</label>
             <div>
-                
+                <span *ngIf="!form.get('username')?.valid && form.get('username')?.touched" style="color:red ;">Please enter a valid username</span>
                 <input  [formControlName]="'username'" type="text">
             </div> 
              

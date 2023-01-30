@@ -24,10 +24,13 @@ export class SignUpBusinessComponent implements OnInit {
       email: new FormControl("", [Validators.required, Validators.email]),
       webSite: new FormControl("", Validators.required),
       username: new FormControl("", {
-        validators: [Validators.required],
+        validators: [Validators.required,Validators.min(5)],
         updateOn: "blur"
       }), 
-      password: new FormControl("", Validators.required)
+      password: new FormControl("", [Validators.required, Validators.min(8), 
+        Validators.pattern(
+          '^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)[A-Za-z\\d!$%@#£€*?&]{8,}$'
+        )])
     });
 
     this.payload = {
